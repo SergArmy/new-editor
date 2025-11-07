@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editor Test Runner</title>
+    <link rel="stylesheet" href="styles/test-runner.css">
+</head>
+
+<body>
+    <div id="test-runner">
+        <header>
+            <h1>Editor Test Runner</h1>
+            <div class="controls">
+                <button id="run-all">Run All</button>
+                <input type="text" id="filter" placeholder="Filter tests...">
+            </div>
+        </header>
+
+        <aside id="suite-list"></aside>
+        <main id="test-results"></main>
+    </div>
+
+    <script type="module" src="tests/test-framework/index.js"></script>
+    <script type="module" src="tests/test-runner-init.js"></script>
+</body>
+
+</html>

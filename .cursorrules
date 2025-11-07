@@ -1,0 +1,191 @@
+# Development Prompt for Inline Editor Project
+
+## 1. Inputs and Context
+
+**ALWAYS read first:**
+- `editor/docs/MASTER_PLAN.md` - single source of truth for plan and statuses
+- `editor/docs/PROGRESS.md` - chronological execution log
+- `editor/docs/ANALYSIS_CURRENT.md` - latest analysis
+- `editor/docs/ANALYSIS.md` - previous analysis snapshot
+- `ОбщееТЗ.txt` - product requirements
+
+**Check conversation summary for:**
+- Unfinished work from previous session
+- Recent changes not yet documented
+- Current bugs/issues reported by user
+- If found, document them FIRST before proceeding with new work
+
+## 2. Work Cadence
+
+- Work in small, incremental steps
+- After completing a step, announce the next one
+- Before any edits: ensure clear task list; if multi-step, create/update TODO
+- After each successful step, immediately log the result (see section 4)
+
+## 3. Quality Gates (mandatory for each step)
+
+- ✅ All tests green (or updated appropriately if test changes needed)
+- ✅ No linter errors
+- ✅ UX verified for affected feature (manual smoke test acceptable for UI changes)
+- ✅ Code follows existing patterns and architecture
+
+## 4. Mandatory Logging (ALWAYS update)
+
+### docs/PROGRESS.md
+Append new section entry with:
+```
+### Шаг N: [Title] ✅
+**Дата:** YYYY-MM-DD HH:mm
+**Что сделано:**
+- Bullet point 1
+- Bullet point 2
+**Файлы:**
+- path/to/file1.js
+- path/to/file2.js
+**Тесты:**
+- Added/updated tests/unit/...
+**Результат:** One sentence describing outcome
+```
+
+### docs/MASTER_PLAN.md
+Update checkboxes with timestamps:
+- `[x]` - Completed (add `Completed At: YYYY-MM-DD HH:mm`)
+- `[~]` - In Progress (add `In Progress: YYYY-MM-DD HH:mm` with sub-tasks)
+- `[ ]` - Pending
+- `[!]` - Blocked (add `Blocked: [reason]`)
+
+## 5. Default Operation Order
+
+1. **Discovery**: Scan code and docs to understand current state
+2. **Check Summary**: Review conversation summary for unfinished work
+3. **Document First**: If previous work undocumented, log it immediately
+4. **Create TODO**: Update TODO list for current step if multi-step
+5. **Implement**: Make minimal, focused changes
+6. **Test**: Run tests, fix failures
+7. **Verify**: Manual verification for UI/UX changes
+8. **Update Docs**: Update PROGRESS.md and MASTER_PLAN.md with timestamps
+9. **Announce Next**: State next step clearly
+
+## 6. Task States Management
+
+### In MASTER_PLAN.md:
+- `[x]` - Completed (with timestamp)
+- `[~]` - In Progress (with start timestamp and sub-tasks)
+- `[ ]` - Pending
+- `[!]` - Blocked (with blocker description)
+
+### If task is partially done:
+1. Document current state in PROGRESS.md
+2. Mark as `[~]` in MASTER_PLAN.md with "In Progress: YYYY-MM-DD HH:mm"
+3. Either complete it or log blockers before switching tasks
+
+## 7. Bug Handling
+
+### If bug found or user reports issue:
+1. Create "### Known Issues" section in MASTER_PLAN.md if not exists
+2. Log bug with `[ ]` checkbox
+3. Fix immediately if blocking current task
+4. Or create TODO and continue with plan if non-blocking
+5. Mark `[x]` when fixed with timestamp
+
+### Known Issues format in MASTER_PLAN.md:
+```markdown
+### 8) Known Issues / Bugs
+- [x] Bug description — Fixed: YYYY-MM-DD HH:mm
+- [ ] Bug description — Reported: YYYY-MM-DD HH:mm
+```
+
+## 8. Priority Management
+
+Priority order:
+1. **User explicit request** > Everything else
+2. **Blocking bugs** > New features
+3. **Backlog order** (from MASTER_PLAN.md)
+4. If dependency missing, skip to next viable task
+5. Always log reason for deviation
+
+## 9. Timestamps
+
+- Use current date from system context (user_info.Current Date if available)
+- Format: `YYYY-MM-DD HH:mm`
+- If exact time unavailable, use: `YYYY-MM-DD (session N)`
+
+## 10. Definition of Done (DoD)
+
+✅ Implemented (code complete)
+✅ Tested (unit/integration tests pass)
+✅ Lint-clean (no linter errors)
+✅ Documented (PROGRESS.md + MASTER_PLAN.md updated)
+✅ UX verified (manual test for UI changes)
+✅ No regressions (existing tests still pass)
+
+## 11. Priority Backlog (from MASTER_PLAN.md)
+
+Current priorities:
+1. Integrate InlineFormatter with TextBlock (bold/italic/links) - IN PROGRESS
+2. Connect Drag & Drop to EditorCore
+3. Integrate Clipboard with blocks
+4. Connect MultiSelect
+
+## 12. Architecture Principles
+
+- **Dependency Injection (DI)**: All dependencies passed explicitly
+- **Separation of Concerns**: Clear layer separation
+- **One-Way Data Flow**: State → View → Events → Actions → State
+- **Command Pattern**: All user actions as commands (undo/redo support)
+- **Event-Driven**: Use EventBus for component communication
+
+## 13. Code Style
+
+- ES2022+ JavaScript (Vanilla, no frameworks)
+- JSDoc for all public methods
+- Use existing patterns and conventions
+- Follow project structure (see `editor/src/`)
+- Test-driven when possible
+
+## 16. Keyboard Shortcuts Handling
+
+**CRITICAL**: When implementing keyboard shortcuts, always use physical key codes (`e.code`) instead of character codes (`e.key`) to ensure shortcuts work regardless of keyboard layout/language.
+
+**Why**: `e.key` returns the character based on current keyboard layout (e.g., 'q' in English, 'й' in Russian), while `e.code` returns the physical key position (e.g., 'KeyQ' for the Q key regardless of layout).
+
+**Example**:
+```javascript
+// ❌ BAD - won't work with different keyboard layouts
+if (e.key === 'q' || e.key === 'Q') { ... }
+
+// ✅ GOOD - works with any keyboard layout
+if (e.code === 'KeyQ' || e.key === 'q' || e.key === 'Q') { ... }
+// Note: Keep e.key as fallback for older browsers that don't support e.code
+```
+
+**Best Practice**: Use `e.code` as primary check, with `e.key` as fallback for compatibility.
+
+## 14. Project Structure
+
+Key directories:
+- `editor/src/` - Source code
+- `editor/docs/` - Documentation
+- `editor/tests/` - Tests
+- `editor/styles/` - Styles
+
+Key files:
+- `editor/docs/MASTER_PLAN.md` - Master plan
+- `editor/docs/PROGRESS.md` - Progress log
+- `editor/src/app.js` - Application entry
+- `editor/src/editor/EditorCore.js` - Editor core
+
+## 15. Commands
+
+```bash
+# Dev server
+cd editor && npm run dev
+
+# Tests
+http://localhost:5173/testrunner.html
+```
+
+---
+
+**Remember**: Always check PROGRESS.md and MASTER_PLAN.md first. Document everything. Work incrementally. Test everything.
+

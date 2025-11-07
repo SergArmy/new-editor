@@ -1,0 +1,15 @@
+{
+  "name": "inline-editor-1c",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "serve -l 5173 .",
+    "test:open": "start ./testrunner.html"
+  },
+  "devDependencies": {
+    "serve": "14.2.1"
+  }
+}
+
+

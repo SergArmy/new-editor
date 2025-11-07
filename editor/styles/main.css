@@ -1,0 +1,1936 @@
+/* ==========================================================================
+   Базовые стили: Применяются ко всем элементам или телу документа.
+   ========================================================================== */
+
+* {
+    /* Гарантирует, что padding и border включены в общую ширину/высоту элемента */
+    box-sizing: border-box;
+    /* Сбрасывает внешние отступы для всех элементов */
+    margin: 0;
+    /* Сбрасывает внутренние отступы для всех элементов */
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-family);
+    line-height: 1.6;
+    /* Основной шрифт для всего текста */
+    /* Межстрочный интервал для лучшей читаемости */
+    color: var(--text-color);
+    /* Цвет основного текста, определяется переменной */
+    background-color: var(--color-bg);
+    /* Светлый фоновый цвет для страницы */
+    padding: var(--spacing-4);
+    /* Внутренний отступ от краев окна */
+    max-width: 1200px;
+    /* Максимальная ширина содержимого страницы */
+    margin: 0 auto;
+    /* Центрирует содержимое по горизонтали */
+}
+
+/* ==========================================================================
+   Автосохранение: индикатор статуса
+   ========================================================================== */
+
+.autosave-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-sm, 0.5rem);
+    margin-bottom: var(--spacing-3, 0.75rem);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-muted-color, #4a5568);
+    letter-spacing: 0.01em;
+}
+
+.autosave-indicator::before {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: currentColor;
+    opacity: 0.85;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.autosave-indicator__text {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs, 0.25rem);
+}
+
+.autosave-indicator[data-status="saved"] {
+    color: var(--success-color);
+}
+
+.autosave-indicator[data-status="pending"] {
+    color: var(--warning-color);
+}
+
+.autosave-indicator[data-status="saving"] {
+    color: var(--accent-color);
+}
+
+.autosave-indicator[data-status="error"] {
+    color: var(--danger-color);
+}
+
+.autosave-indicator[data-status="saving"]::before {
+    animation: autosave-pulse 1.2s ease-in-out infinite;
+}
+
+.autosave-indicator[data-status="pending"]::before {
+    opacity: 1;
+}
+
+.autosave-indicator[data-status="error"]::before {
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+@keyframes autosave-pulse {
+    0% {
+        opacity: 0.5;
+        transform: scale(0.9);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.2);
+    }
+
+    100% {
+        opacity: 0.5;
+        transform: scale(0.9);
+    }
+}
+
+/* ==========================================================================
+   Стили для выделения блоков
+   ========================================================================== */
+.block-highlight {
+    position: relative;
+    z-index: 1000;
+}
+
+.block-highlight::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: -10px;
+    right: -10px;
+    bottom: -6px;
+    border: 1px solid var(--danger-color);
+    border-radius: calc(var(--border-radius) + 1px);
+    pointer-events: none;
+    z-index: -1;
+    box-shadow: 0 0 8px rgba(229, 62, 62, 0.3);
+    animation: pulse-outer 2s infinite;
+}
+
+@keyframes pulse-outer {
+    0% {
+        box-shadow: 0 0 6px rgba(229, 62, 62, 0.3);
+        border-color: var(--danger-color);
+    }
+
+    50% {
+        box-shadow: 0 0 12px rgba(229, 62, 62, 0.6);
+        border-color: #ff6b6b;
+    }
+
+    100% {
+        box-shadow: 0 0 6px rgba(229, 62, 62, 0.3);
+        border-color: var(--danger-color);
+    }
+}
+
+/* ==========================================================================
+   Стили контейнеров и макета документа
+   ========================================================================== */
+
+.editor-container {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    padding: var(--spacing-4);
+    max-width: 900px;
+    margin: 0 auto;
+    background-color: var(--color-bg);
+}
+
+.document-container {
+    background-color: var(--document-bg);
+    /* Фон для основного блока документа */
+    box-shadow: var(--shadow);
+    /* Тень для придания объема */
+    border-radius: var(--border-radius);
+    /* Скругленные углы контейнера */
+    overflow: hidden;
+    /* Обрезает содержимое, выходящее за границы элемента */
+    position: relative;
+    /* Устанавливает контекст позиционирования для дочерних элементов */
+}
+
+.document-block {
+    margin-bottom: var(--spacing-md);
+    padding: var(--spacing-md);
+    transition: var(--transition);
+}
+
+.document-block:last-child {
+    margin-bottom: 0;
+}
+
+.document-block:hover {
+    background-color: rgba(0, 0, 0, 0.01);
+}
+
+/* Стили для Drag & Drop */
+.document-block.dragging {
+    opacity: 0.5;
+    cursor: grabbing;
+}
+
+/* Стили для выделения блоков */
+.document-block {
+    transition: background-color 0.2s ease, border-left 0.2s ease, padding-left 0.2s ease;
+}
+
+.document-block.block-selected {
+    background-color: rgba(59, 130, 246, 0.1);
+    border-left: 3px solid var(--accent-color);
+    padding-left: calc(var(--spacing-md) - 3px);
+}
+
+/* Стили для drop на блоках */
+.document-block.drop-target-container {
+    border: 2px dashed rgba(59, 130, 246, 0.3);
+    border-radius: 4px;
+}
+
+.document-block.drop-target-before {
+    border-top: 3px solid rgba(59, 130, 246, 0.5);
+    margin-top: -2px;
+}
+
+.document-block.drop-target-active {
+    background-color: rgba(59, 130, 246, 0.15);
+}
+
+.document-block.drop-target-active.drop-target-container {
+    border: 2px solid var(--accent-color);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.document-block.drop-target-active.drop-target-before {
+    border-top: 3px solid var(--accent-color);
+    box-shadow: 0 -2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.document-block[draggable="true"] {
+    cursor: grab;
+}
+
+.document-block[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+/* Drop zone индикаторы */
+.drop-zone-indicator {
+    height: 4px;
+    margin: var(--spacing-xs) 0;
+    border-radius: 2px;
+    background-color: transparent;
+    transition: all 0.1s ease;
+    /* Быстрее */
+    position: relative;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Показываем все зоны при перетаскивании */
+.drop-zone-indicator.drop-zone-visible {
+    opacity: 0.3;
+    pointer-events: auto;
+    background-color: var(--border-color);
+    height: 2px;
+}
+
+.drop-zone-indicator::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 2px;
+    background-color: transparent;
+    border-top: 2px dashed transparent;
+    border-bottom: 2px dashed transparent;
+    transition: var(--transition);
+}
+
+/* Активная зона - более яркая и толстая */
+.drop-zone-indicator.drop-zone-active {
+    opacity: 1;
+    background-color: var(--accent-color);
+    height: 4px;
+    margin: var(--spacing-sm) 0;
+    box-shadow: 0 0 8px rgba(59, 130, 246, 0.4);
+}
+
+.drop-zone-indicator.drop-zone-active::before {
+    border-top-color: var(--accent-color);
+    border-bottom-color: var(--accent-color);
+    height: 4px;
+}
+
+/* Placeholder для визуализации места вставки */
+.drag-placeholder {
+    background: rgba(59, 130, 246, 0.1);
+    border: 2px dashed var(--accent-color);
+    border-radius: 4px;
+    margin: 8px 0;
+    opacity: 0;
+    animation: fadeInPlaceholder 0.2s ease forwards;
+}
+
+@keyframes fadeInPlaceholder {
+    to {
+        opacity: 1;
+    }
+}
+
+.document-header {
+    background-color: var(--header-bg);
+    /* Фон для шапки документа */
+    color: var(--header-color);
+    /* Цвет текста шапки документа */
+    padding: var(--spacing-5) var(--spacing-6);
+    /* Внутренние отступы шапки */
+    border-bottom: 4px solid var(--accent-color);
+    /* Акцентная полоса внизу шапки */
+    position: relative;
+    /* Устанавливает контекст позиционирования для дочерних элементов */
+}
+
+.document-title {
+    font-size: 32px;
+    /* Размер шрифта для основного заголовка документа */
+    font-weight: 600;
+    /* Полужирное начертание */
+    margin-bottom: var(--spacing-2);
+    /* Отступ снизу */
+}
+
+.document-subtitle {
+    font-size: 18px;
+    /* Размер шрифта для подзаголовка документа */
+    opacity: 0.9;
+    /* Небольшая прозрачность */
+    margin-bottom: var(--spacing-1);
+    /* Отступ снизу */
+}
+
+.document-metadata {
+    display: flex;
+    /* Использует Flexbox для расположения элементов */
+    justify-content: space-between;
+    /* Распределяет элементы равномерно с пространством между ними */
+    margin-top: var(--spacing-3);
+    /* Отступ сверху */
+    font-size: 14px;
+    /* Размер шрифта для мета-информации */
+    opacity: 0.85;
+    /* Небольшая прозрачность */
+}
+
+.document-footer {
+    text-align: center;
+    /* Выравнивание текста по центру */
+    padding: 20px;
+    /* Внутренние отступы */
+    border-top: 1px solid var(--border-color);
+    /* Тонкая серая линия сверху */
+    color: #718096;
+    /* Серый цвет текста футера */
+    font-size: 14px;
+    /* Размер шрифта */
+}
+
+/* Тело документа */
+.document-body {
+    padding: var(--spacing-4);
+    /* Внутренний отступ для содержимого документа */
+}
+
+/* ==========================================================================
+   Стили секций и подразделов
+   ========================================================================== */
+.section {
+    margin-bottom: var(--spacing-6);
+    /* Отступ снизу каждой секции */
+
+
+    /* Акцентная полоса слева */
+    padding-left: var(--spacing-4);
+    /* Внутренний отступ слева для содержимого секции */
+    position: relative;
+    /* Устанавливает контекст позиционирования для дочерних элементов */
+}
+
+.section-level-1 {
+    border-left: 3px solid var(--h4-color);
+}
+
+.section-level-2,
+.section-level-3,
+.section-level-4,
+.section-level-5 {
+    border-left: 1px solid var(--border-color);
+}
+
+
+.section-title {
+    padding-bottom: 8px;
+    /* Внутренний отступ снизу */
+    border-bottom: 1px solid var(--border-color);
+    /* Тонкая серая линия под заголовком */
+    display: flex;
+    /* Использует Flexbox для расположения элементов */
+    justify-content: space-between;
+    /* Распределяет элементы равномерно с пространством между ними */
+    align-items: center;
+    /* Выравнивает элементы по центру по вертикали */
+    margin-bottom: 20px;
+    /* Отступ снизу */
+}
+
+.section-title span {
+    flex-grow: 1;
+    /* Позволяет тексту заголовка занимать все доступное пространство */
+}
+
+.section-title h2 {
+    font-size: 24px;
+    /* Размер шрифта для заголовка секции */
+    color: var(--h2-color);
+    /* Цвет заголовка секции */
+}
+
+.section-title h3 {
+    font-size: 20px;
+    /* Размер шрифта для заголовка секции */
+    color: var(--h3-color);
+    /* Цвет заголовка секции */
+}
+
+.section-title h4 {
+    font-size: 18px;
+    /* Размер шрифта для заголовка секции */
+    color: var(--h4-color);
+    /* Цвет заголовка секции */
+}
+
+.section-title h5 {
+    font-size: 16px;
+    /* Размер шрифта для заголовка секции */
+    color: var(--h5-color);
+    /* Цвет заголовка секции */
+}
+
+.section-title h6 {
+    font-size: 14px;
+    /* Размер шрифта для заголовка секции */
+    color: var(--h6-color);
+    /* Цвет заголовка секции */
+
+}
+
+/* ==========================================================================
+   Стили текстовых блоков
+   ========================================================================== */
+
+.text-block {
+    line-height: 1.7;
+    /* Межстрочный интервал для лучшей читаемости */
+    padding-bottom: var(--spacing-3);
+    /* Внутренние отступы низ */
+}
+
+.text-block p {
+    margin-bottom: var(--spacing-1);
+    /* Наружние отступы низ */
+}
+
+.text-content {
+    color: var(--text-color);
+}
+
+/* ==========================================================================
+   Стили примечаний и цитат
+   ========================================================================== */
+
+.quote-block {
+    padding: var(--spacing-4);
+    /* Внутренние отступы верх право низ лево*/
+    margin: var(--spacing-4) 0;
+    /* Наружние отступы */
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+    border-left: 3px solid;
+    /* Линия слева*/
+}
+
+.quote-title {
+    font-weight: 600;
+    margin-bottom: var(--spacing-2);
+    display: flex;
+    align-items: center;
+}
+
+.quote-title i {
+    margin-right: var(--spacing-2);
+}
+
+.quote-type-default {
+    background-color: #f7fafc;
+    border-left-color: var(--accent-color);
+}
+
+.quote-type-default .quote-title {
+    color: var(--accent-color);
+}
+
+/* Блок информации */
+.quote-type-info {
+    background-color: #ebf8ff;
+    border-left-color: var(--info-color);
+}
+
+/* Блок информации Заголовок */
+.quote-type-info .quote-title {
+    color: var(--info-color);
+}
+
+/* Блок предупреждения */
+.quote-type-warning {
+    background-color: #fffaf0;
+    border-left-color: var(--warning-color);
+}
+
+/* Блок предупреждения Заголовок */
+.quote-type-warning .quote-title {
+    color: var(--warning-color);
+}
+
+/* Блок важный */
+.quote-type-important {
+    background-color: #fff5f5;
+    border-left-color: var(--danger-color);
+}
+
+/* Блок важный Заголовок */
+.quote-type-important .quote-title {
+    color: var(--danger-color);
+}
+
+/* Блок успех */
+.quote-type-success {
+    background-color: #f0fff4;
+    border-left-color: var(--success-color);
+}
+
+/* Блок успех Заголовок */
+.quote-type-success .quote-title {
+    color: var(--success-color);
+}
+
+/* Блок совет/рекомендация */
+.quote-type-tip {
+    background-color: #e6fffa;
+    border-left-color: var(--tip-color);
+}
+
+/* Блок совет/рекомендация Заголовок */
+.quote-type-tip .quote-title {
+    color: var(--tip-color);
+
+}
+
+/* Блок примечание */
+.quote-type-note {
+    background-color: #faf5ff;
+    border-left-color: var(--note-color);
+}
+
+/* Блок примечание Заголовок */
+.quote-type-note .quote-title {
+    color: var(--note-color);
+}
+
+/* автор */
+.quote-author {
+    text-align: right;
+    font-style: italic;
+    margin-top: var(--spacing-md);
+    color: #718096;
+}
+
+/* ==========================================================================
+   Стили Изображение
+   ========================================================================== */
+
+.image-block {
+    text-align: center;
+    margin: var(--spacing-4) 0;
+}
+
+.image-block img {
+    max-width: 100%;
+    height: auto;
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.image-caption {
+    font-style: italic;
+    color: #718096;
+    margin-top: var(--spacing-2);
+    text-align: center;
+}
+
+
+/* ==========================================================================
+   Стили блока кода
+   ========================================================================== */
+
+.code-block {
+    background-color: #2d3748 !important;
+    color: #e2e8f0;
+    border-radius: var(--border-radius);
+    margin: var(--spacing-3) 0;
+    line-height: 1.5;
+    box-shadow: var(--shadow);
+    font-family: 'Consolas', 'Courier New', monospace;
+    overflow: hidden;
+    /* hidden для правильного отображения закругления */
+    position: relative;
+    padding: 0;
+    /* Убираем все padding */
+}
+
+.code-block-header {
+    display: flex;
+    justify-content: flex-end;
+    /* Прижимаем все вправо */
+    align-items: center;
+    background-color: #2d3748;
+    /* Такой же цвет как у основного блока */
+    padding: var(--spacing-2) var(--spacing-3);
+    /*border-bottom: 1px solid rgba(255, 255, 255, 0.1);*/
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+/* Левая и правая части header */
+.code-header-left,
+.code-header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-2);
+    padding: var(--spacing-1) var(--spacing-1);
+}
+
+/* Кнопка копирования */
+.code-copy-btn {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #e2e8f0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: var(--spacing-1) var(--spacing-2);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.code-copy-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.code-copy-btn.copied {
+    color: #48bb78;
+    border-color: rgba(72, 187, 120, 0.3);
+}
+
+.code-copy-btn i {
+    font-size: 14px;
+}
+
+/* Контейнер для выбора языка */
+.code-language-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Кнопка выбора языка */
+.code-language-btn {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #e2e8f0;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: var(--spacing-1) var(--spacing-3);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: var(--font-family);
+}
+
+.code-language-btn:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.code-language-btn:after {
+    /*content: ' ▼';*/
+    font-size: 10px;
+    margin-left: var(--spacing-1);
+}
+
+/* Выпадающий список языков */
+.code-language-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: var(--spacing-1);
+    background-color: #2d3748;
+    /* Такой же как основной блок */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    min-width: 150px;
+    overflow: hidden;
+}
+
+.code-language-item {
+    display: block;
+    width: 100%;
+    padding: var(--spacing-2) var(--spacing-3);
+    background: none;
+    border: none;
+    color: #e2e8f0;
+    text-align: left;
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: var(--font-family);
+}
+
+.code-language-item:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.code-language-item.active {
+    background-color: rgba(66, 153, 225, 0.3);
+    color: #90cdf4;
+}
+
+/* Контейнер для настроек */
+.code-settings-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Кнопка настроек */
+.code-settings-btn {
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #e2e8f0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: var(--spacing-1) var(--spacing-2);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.code-settings-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.code-settings-btn i {
+    font-size: 14px;
+}
+
+/* Выпадающий список настроек */
+.code-settings-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: var(--spacing-1);
+    background-color: #2d3748;
+    /* Такой же как основной блок */
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    min-width: 200px;
+    overflow: hidden;
+}
+
+/* Элемент настройки */
+.code-settings-item {
+    padding: var(--spacing-2) var(--spacing-3);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.code-settings-item:last-child {
+    border-bottom: none;
+}
+
+.code-settings-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    user-select: none;
+}
+
+.code-settings-text {
+    color: #e2e8f0;
+    font-size: var(--font-size-sm);
+    flex: 1;
+}
+
+.code-settings-checkbox {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.code-settings-slider {
+    position: relative;
+    width: 36px;
+    height: 20px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    transition: var(--transition);
+    margin-left: var(--spacing-3);
+}
+
+.code-settings-slider:before {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    left: 2px;
+    top: 2px;
+    background-color: white;
+    border-radius: 50%;
+    transition: var(--transition);
+}
+
+.code-settings-checkbox:checked+.code-settings-slider {
+    background-color: var(--accent-color);
+}
+
+.code-settings-checkbox:checked+.code-settings-slider:before {
+    transform: translateX(16px);
+}
+
+.code-editor-container {
+    padding-bottom: 12px;
+    /* Отступ для resize handle */
+    min-height: 50px;
+    background-color: #2d3748;
+    /* Такой же фон как у .code-block */
+    color: #e2e8f0;
+    /* Такой же цвет как у .code-block */
+    position: relative;
+    overflow: hidden;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+}
+
+.code-editor-container pre {
+    background-color: transparent !important;
+    color: inherit;
+    margin: 0;
+    padding: 0;
+    border: none;
+    font-family: inherit;
+}
+
+.code-editor-container textarea {
+    background-color: transparent !important;
+    color: inherit;
+    border: none;
+    outline: none;
+    resize: none;
+    width: 100%;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+/* Стили для Monaco Editor внутри code-editor-container */
+.code-editor-container .monaco-editor {
+    background-color: #2d3748 !important;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    overflow: hidden;
+}
+
+.code-editor-container .monaco-editor .monaco-editor-background {
+    background-color: #2d3748 !important;
+}
+
+.code-editor-container .monaco-editor .margin,
+.code-editor-container .monaco-editor .margin-view-overlays,
+.code-editor-container .monaco-editor .monaco-scrollable-element,
+.code-editor-container .monaco-editor .overflow-guard {
+    background-color: #2d3748 !important;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+}
+
+.code-editor-container .monaco-editor .monaco-scrollable-element>.scrollbar {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Стили для миникарты Monaco - более темный оттенок для выделения */
+.code-editor-container .monaco-editor .minimap {
+    background-color: #1a202c !important;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.3);
+}
+
+.code-editor-container .monaco-editor .minimap-slider {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.code-editor-container .monaco-editor .minimap-slider:hover {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.code-language {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #a0aec0;
+    padding: var(--spacing-1);
+    font-size: var(--font-size-xs);
+    border-bottom-left-radius: var(--border-radius);
+}
+
+/* Resize handle для изменения размера блока кода */
+.code-resize-handle {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 12px;
+    background-color: #2d3748;
+    /*border-top: 1px solid rgba(255, 255, 255, 0.1);*/
+    cursor: ns-resize;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color var(--transition);
+    z-index: 10;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    /* Закругление совпадает с контейнером */
+}
+
+.code-resize-handle:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.code-resize-handle i {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 12px;
+    pointer-events: none;
+}
+
+.code-resize-handle:hover i {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* Визуальная обратная связь при изменении размера */
+.code-block.resizing {
+    user-select: none;
+}
+
+.code-block.resizing .code-resize-handle {
+    background-color: rgba(255, 255, 255, 0.15);
+}
+
+.code-block.resizing .code-resize-handle i {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* ==========================================================================
+   Стили блока сравнения кода
+   ========================================================================== */
+
+.comparison-block {
+    margin: var(--spacing-6) 0;
+}
+
+.comparison-title {
+    font-size: var(--font-size-4);
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-3);
+    display: flex;
+    align-items: center;
+    padding-bottom: var(--spacing-sm);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.comparison-title i {
+    margin-right: var(--spacing-2);
+    color: var(--accent-color);
+}
+
+.comparison-content {
+    display: flex;
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-4);
+}
+
+@media (max-width: 768px) {
+    .comparison-content {
+        flex-direction: column;
+    }
+}
+
+.comparison-column {
+    flex: 1;
+    border-radius: var(--border-radius);
+    overflow: hidden;
+    border: 1px solid;
+}
+
+.comparison-column.incorrect {
+    border-color: var(--danger-color);
+}
+
+.comparison-column.correct {
+    border-color: var(--success-color);
+}
+
+.comparison-header {
+    padding: var(--spacing-3);
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    color: white;
+}
+
+.comparison-column.incorrect .comparison-header {
+    background-color: var(--danger-color);
+}
+
+.comparison-column.correct .comparison-header {
+    background-color: var(--success-color);
+}
+
+.comparison-header i {
+    margin-right: var(--spacing-2);
+}
+
+.comparison-body {
+    padding: var(--spacing-md);
+    background-color: #f8fafc;
+}
+
+.comparison-body.incorrect {
+    background-color: #dba5a534;
+}
+
+.comparison-body.correct {
+    background-color: #a2d6ba3b;
+}
+
+/* ==========================================================================
+   Стили блока таблицы
+   ========================================================================== */
+
+
+.table-block {
+    overflow-x: auto;
+    margin: var(--spacing-lg) 0;
+}
+
+.table-block table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.table-block th {
+    background-color: var(--primary-color);
+    color: white;
+    text-align: left;
+    padding: var(--spacing-md);
+}
+
+.table-block td {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.table-block tr:nth-child(even) {
+    background-color: #f8fafc;
+}
+
+/* ==========================================================================
+   Стили для блоков диаграмм PlantUML
+   ========================================================================== */
+
+.diagram-block {
+    margin: var(--spacing-lg) 0;
+    padding: var(--spacing-lg);
+    background-color: #f7fafc;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+    position: relative;
+}
+
+.diagram-container {
+    overflow: hidden;
+    margin: var(--spacing-md) 0;
+    border-radius: var(--border-radius);
+    background: white;
+    position: relative;
+    min-height: 400px;
+    /* Фиксированная минимальная высота */
+    height: 500px;
+    /* Фиксированная высота для стабильности */
+}
+
+
+/* Контейнер PlantUML Viewer */
+.plantuml-viewer-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    /* Изменено с visible на hidden */
+    font-family: var(--font-family);
+    background: #f5f5f5;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    min-height: 400px;
+    height: 500px;
+    /* Синхронизируем высоту */
+}
+
+.plantuml-viewer-main {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+    height: 450px;
+    /* Фиксированная высота основного контейнера */
+}
+
+plantuml-viewer-diagram {
+    height: 100%;
+    width: 100%;
+    border: none;
+    background: white;
+    overflow: auto;
+    /* Добавляем скролл при необходимости */
+    min-height: 400px;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* Блок для отображения кода */
+.plantuml-viewer-code {
+    display: none;
+    height: 100%;
+    width: 100%;
+    border: none;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+    min-height: 400px;
+}
+
+/* Используем стандартный блок кода */
+.plantuml-viewer-code .code-block {
+    height: 100%;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+    position: relative;
+    overflow: auto;
+}
+
+
+/* Убираем стандартные отступы для лучшего заполнения пространства */
+.plantuml-viewer-code .code-block pre {
+    height: 100%;
+    margin: 0;
+    padding: var(--spacing-md);
+    background: transparent !important;
+    border-radius: 0;
+}
+
+
+
+/* Обеспечиваем одинаковое оформление для кода */
+.plantuml-viewer-code pre {
+    margin: 0;
+    padding: var(--spacing-md);
+    height: 100%;
+    background: transparent !important;
+    color: #e2e8f0;
+    overflow: auto;
+}
+
+
+.plantuml-viewer-code code {
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: var(--font-size-sm);
+    line-height: 1.5;
+    background: transparent !important;
+    color: #e2e8f0;
+    display: block;
+    height: 100%;
+}
+
+/* Показываем код при активном режиме */
+.plantuml-viewer-container.code-mode .plantuml-viewer-diagram {
+    display: none;
+}
+
+.plantuml-viewer-container.code-mode .plantuml-viewer-code {
+    display: block;
+}
+
+.plantuml-viewer-status {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-xs);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f0f0f0;
+    color: #666;
+    border-top: 1px solid var(--border-color);
+    position: relative;
+    z-index: 10;
+}
+
+.plantuml-viewer-status-left {
+    display: flex;
+    align-items: center;
+}
+
+.plantuml-viewer-spinner {
+    width: 16px;
+    height: 16px;
+    margin-right: var(--spacing-sm);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    animation: pv-spin 1s linear infinite;
+}
+
+.plantuml-viewer-spinner circle {
+    stroke: var(--accent-color);
+}
+
+@keyframes pv-spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Элементы управления */
+.puv-controls {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    position: relative;
+    z-index: 1000;
+}
+
+.puv-menu-container {
+    display: flex;
+    gap: var(--spacing-xs);
+    position: relative;
+}
+
+.puv-menu-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+/* Кнопка переключения режима */
+.puv-toggle-view-btn {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+    color: var(--text-color);
+    transition: var(--transition);
+    margin-right: var(--spacing-xs);
+}
+
+.puv-toggle-view-btn:hover {
+    background-color: #f0f0f0;
+}
+
+.puv-toggle-view-btn.active {
+    background-color: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+/* Выпадающие меню */
+.puv-dropdown-menu {
+    display: none;
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    z-index: 1001;
+    flex-direction: column;
+    padding: var(--spacing-xs);
+    gap: 1px;
+    margin-bottom: 5px;
+    min-width: max-content;
+}
+
+.puv-menu-open {
+    display: flex;
+}
+
+.puv-control-btn {
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: var(--font-size-xs);
+    color: var(--text-color);
+    transition: var(--transition);
+    position: relative;
+    z-index: 1002;
+}
+
+.puv-control-btn:hover {
+    background-color: #f0f0f0;
+}
+
+.puv-control-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.puv-menu-btn-active {
+    background-color: var(--light-color);
+    border-color: var(--accent-color);
+}
+
+.puv-menu-item {
+    background: none;
+    border: none;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    cursor: pointer;
+    text-align: left;
+    font-size: var(--font-size-xs);
+    white-space: nowrap;
+    border-radius: 2px;
+    transition: var(--transition);
+}
+
+.puv-menu-item:hover {
+    background-color: var(--light-color);
+}
+
+.puv-menu-item:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Лоадер */
+.plantuml-viewer-loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.9);
+    display: none;
+    /* По умолчанию скрыт */
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.plantuml-viewer-loader-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid var(--accent-color);
+    border-radius: 50%;
+    animation: pv-spin 1s linear infinite;
+    margin-bottom: var(--spacing-md);
+}
+
+.plantuml-viewer-loader-text {
+    font-size: var(--font-size-sm);
+    color: #666;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .diagram-container {
+        min-height: 250px;
+    }
+
+    .plantuml-viewer-container {
+        min-height: 350px;
+    }
+
+    .puv-menu-container {
+        flex-direction: column;
+    }
+
+    .puv-dropdown-menu {
+        left: auto;
+        right: 0;
+    }
+
+    plantuml-viewer-code .code-block {
+        font-size: var(--font-size-xs);
+    }
+
+    .plantuml-viewer-code .code-block pre {
+        padding: var(--spacing-sm);
+    }
+}
+
+/* Специфические стили для меню */
+.puv-copy-menu {
+    min-width: 140px;
+}
+
+.puv-position-menu {
+    min-width: 120px;
+}
+
+
+/* ==========================================================================
+   Стили для чекбоксов
+   ========================================================================== */
+
+.checklist-block {
+    margin: var(--spacing-lg) 0;
+}
+
+.checklist-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: var(--spacing-md);
+}
+
+.checklist-item input[type="checkbox"] {
+    margin-right: var(--spacing-md);
+    margin-top: var(--spacing-xs);
+}
+
+/* ==========================================================================
+   Стили для блока действия
+   ========================================================================== */
+
+.action-block {
+    background-color: #f0fff4;
+    border-left: 4px solid var(--success-color);
+    padding: var(--spacing-lg);
+    margin: var(--spacing-lg) 0;
+    border-radius: 0 var(--border-radius) var(--border-radius) 0;
+}
+
+.action-responsible {
+    display: flex;
+    justify-content: space-between;
+    margin-top: var(--spacing-md);
+    font-size: var(--font-size-sm);
+}
+
+/* ==========================================================================
+   Стили для блока пошаговой инструкции
+   ========================================================================== */
+
+steps-block {
+    margin: var(--spacing-lg) 0;
+    counter-reset: step-counter;
+}
+
+.step-item {
+    display: flex;
+    margin-bottom: var(--spacing-md);
+    counter-increment: step-counter;
+}
+
+.step-number {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    background-color: var(--accent-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: var(--spacing-md);
+    /*font-weight: bold;*/
+}
+
+/* ==========================================================================
+   Стили для блока определения
+   ========================================================================== */
+
+.definition-block {
+    margin: var(--spacing-lg) 0;
+    padding: var(--spacing-md);
+    background-color: #f7fafc;
+    border-radius: var(--border-radius);
+}
+
+.definition-term {
+    font-weight: bold;
+    margin-bottom: var(--spacing-xs);
+    color: var(--primary-color);
+}
+
+
+/* ==========================================================================
+   Стили для блока ролей
+   ========================================================================== */
+
+.roles-block {
+    margin: var(--spacing-lg) 0;
+}
+
+.role-item {
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-md);
+    background-color: #f7fafc;
+    border-radius: var(--border-radius);
+    border-left: 3px solid var(--secondary-color);
+}
+
+.role-name {
+    font-weight: bold;
+    margin-bottom: var(--spacing-xs);
+    color: var(--secondary-color);
+}
+
+.role-description {
+    margin-bottom: var(--spacing-md);
+}
+
+.permissions-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+}
+
+.permission-tag {
+    background-color: var(--light-color);
+    color: var(--info-color);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-xs);
+}
+
+/* ==========================================================================
+   Стили для блока содержание
+   ========================================================================== */
+
+.toc-block {
+    margin: var(--spacing-lg) 0;
+    padding: var(--spacing-lg);
+    background-color: #f7fafc;
+    border-radius: var(--border-radius);
+}
+
+.toc-list {
+    list-style-type: none;
+}
+
+.toc-item {
+    margin-bottom: var(--spacing-xs);
+}
+
+.toc-item a {
+    color: var(--accent-color);
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.toc-item a:hover {
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   Стили для меню slash-команд
+   ========================================================================== */
+
+.slash-menu {
+    position: absolute;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1000;
+    min-width: 250px;
+    padding: var(--spacing-xs);
+}
+
+.slash-menu-item {
+    padding: var(--spacing-sm) var(--spacing-md);
+    cursor: pointer;
+    border-radius: calc(var(--border-radius) - 2px);
+    transition: var(--transition);
+    margin-bottom: 2px;
+}
+
+.slash-menu-item:hover,
+.slash-menu-item.selected {
+    background-color: var(--light-color);
+}
+
+.slash-menu-item-label {
+    font-weight: 600;
+    color: var(--text-color);
+    margin-bottom: var(--spacing-xs);
+    font-size: var(--font-size-md);
+}
+
+.slash-menu-item-description {
+    font-size: var(--font-size-sm);
+    color: #718096;
+}
+
+/* ==========================================================================
+   Стили для модальных окон
+   ========================================================================== */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.modal {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    color: var(--text-color);
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--text-color);
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius);
+    transition: var(--transition);
+}
+
+.modal-close:hover {
+    background-color: var(--light-color);
+}
+
+.modal-body {
+    padding: var(--spacing-md);
+}
+
+/* ==========================================================================
+   Стили для диалога ссылок
+   ========================================================================== */
+
+.link-dialog {
+    min-width: 400px;
+}
+
+.form-group {
+    margin-bottom: var(--spacing-md);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: var(--spacing-xs);
+    font-weight: 500;
+    color: var(--text-color);
+    font-size: var(--font-size-sm);
+}
+
+.form-input,
+.form-select {
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-md);
+    font-family: var(--font-family);
+    transition: var(--transition);
+    background-color: white;
+}
+
+.form-input:focus,
+.form-select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: flex-end;
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border-color);
+}
+
+.btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-md);
+    font-weight: 500;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: var(--font-family);
+}
+
+.btn-primary {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: #2563eb;
+}
+
+.btn-secondary {
+    background-color: var(--light-color);
+    color: var(--text-color);
+}
+
+.btn-secondary:hover {
+    background-color: #e2e8f0;
+}
+
+/* ==========================================================================
+   Стили для контекстного меню
+   ========================================================================== */
+
+.context-menu {
+    position: fixed;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 180px;
+    z-index: 10001;
+    padding: var(--spacing-xs);
+    animation: fadeIn 0.15s ease-out;
+}
+
+.context-menu-item {
+    padding: var(--spacing-sm) var(--spacing-md);
+    cursor: pointer;
+    border-radius: calc(var(--border-radius) - 2px);
+    transition: var(--transition);
+    font-size: var(--font-size-md);
+    color: var(--text-color);
+    user-select: none;
+}
+
+.context-menu-item:hover:not(.disabled) {
+    background-color: var(--light-color);
+}
+
+.context-menu-item.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Стили для ссылок в contentEditable */
+.text-content a {
+    color: var(--accent-color);
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.text-content a:hover {
+    color: #2563eb;
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   Стили для кнопки экспорта
+   ========================================================================== */
+
+.btn-export {
+    margin-bottom: var(--spacing-3, 0.75rem);
+    margin-right: var(--spacing-2, 0.5rem);
+}
+
+/* ==========================================================================
+   Стили для диалога экспорта
+   ========================================================================== */
+
+.export-dialog {
+    padding: var(--spacing-md);
+}
+
+.export-dialog__group {
+    margin-bottom: var(--spacing-lg);
+}
+
+.export-dialog__label {
+    display: block;
+    margin-bottom: var(--spacing-sm);
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.export-dialog__select {
+    width: 100%;
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-md);
+    background-color: var(--color-bg);
+    color: var(--text-color);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.export-dialog__select:hover {
+    border-color: var(--accent-color);
+}
+
+.export-dialog__select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.export-dialog__option {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+    gap: var(--spacing-sm);
+}
+
+.export-dialog__option input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--accent-color);
+}
+
+.export-dialog__option label {
+    cursor: pointer;
+    user-select: none;
+    color: var(--text-color);
+}
+
+.export-dialog__buttons {
+    display: flex;
+    gap: var(--spacing-md);
+    justify-content: flex-end;
+    margin-top: var(--spacing-lg);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--border-color);
+}
