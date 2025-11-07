@@ -285,6 +285,28 @@ ApiClient --> EditorCore: response
 EditorCore --> UI: notify success
 @enduml`
                 }
+            },
+            {
+                id: 'block-9',
+                type: 'plantuml',
+                position: 8,
+                parentId: null,
+                protected: false,
+                data: {
+                    title: 'Архитектура модулей',
+                    description: 'Диаграмма автоматически рендерится через PlantUML сервер из исходного кода.',
+                    serverUrl: 'https://www.plantuml.com/plantuml',
+                    format: 'svg',
+                    // renderUrl генерируется автоматически из source
+                    source: `@startuml
+rectangle EditorCore {
+  [SelectionManager]
+  [HistoryManager]
+}
+[SelectionManager] --> [HistoryManager]: события undo/redo
+[EditorCore] --> [ExportManager]
+@enduml`
+                }
             }
         ]
     });

@@ -1707,6 +1707,139 @@ plantuml-viewer-diagram {
 }
 
 /* ==========================================================================
+   Стили для блока PlantUML
+   ========================================================================== */
+
+.plantuml-block {
+    margin: var(--spacing-lg) 0;
+    padding: var(--spacing-lg);
+    border-radius: var(--border-radius);
+    border: 1px solid rgba(72, 61, 139, 0.2);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(129, 140, 248, 0.08));
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.plantuml-header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.plantuml-title {
+    font-weight: 600;
+    font-size: var(--font-size-lg);
+    color: var(--text-color);
+}
+
+.plantuml-meta {
+    font-size: var(--font-size-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(79, 70, 229, 0.85);
+}
+
+.plantuml-description {
+    font-size: var(--font-size-sm);
+    color: rgba(45, 55, 72, 0.8);
+}
+
+.plantuml-preview {
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px dashed rgba(129, 140, 248, 0.5);
+    border-radius: var(--border-radius);
+    background: rgba(255, 255, 255, 0.8);
+    padding: var(--spacing-lg);
+}
+
+.plantuml-preview img {
+    max-width: 100%;
+    height: auto;
+    box-shadow: 0 10px 24px rgba(79, 70, 229, 0.15);
+    border-radius: calc(var(--border-radius) / 1.5);
+}
+
+.plantuml-placeholder {
+    font-size: var(--font-size-sm);
+    color: rgba(79, 70, 229, 0.75);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-lg);
+}
+
+.plantuml-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.plantuml-spinner circle {
+    stroke-dasharray: 90, 150;
+    stroke-dashoffset: 0;
+    animation: dash 1.5s ease-in-out infinite;
+}
+
+@keyframes dash {
+    0% {
+        stroke-dasharray: 1, 150;
+        stroke-dashoffset: 0;
+    }
+
+    50% {
+        stroke-dasharray: 90, 150;
+        stroke-dashoffset: -35;
+    }
+
+    100% {
+        stroke-dasharray: 90, 150;
+        stroke-dashoffset: -124;
+    }
+}
+
+.plantuml-source {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(79, 70, 229, 0.15);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.plantuml-source-label {
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: rgba(55, 48, 163, 0.7);
+}
+
+.plantuml-source pre {
+    margin: 0;
+    font-size: var(--font-size-xs);
+    background: #1f1b2e;
+    color: #ede9fe;
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius);
+    overflow-x: auto;
+}
+
+/* ==========================================================================
    Стили для блока определения
    ========================================================================== */
 

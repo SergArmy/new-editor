@@ -37,7 +37,7 @@ Legend: [x] — выполнено, [ ] — в работе/запланиров
      - [x] ChecklistBlock — Completed At: 2025-11-07 21:00
      - [x] StepsBlock — Completed At: 2025-11-07 21:40
      - [x] DiagramBlock — Completed At: 2025-11-07 22:05
-     - [ ] PlantUMLBlock
+     - [x] PlantUMLBlock — Completed At: 2025-11-07 22:35; Fixed async loading: 2025-11-07 22:50
      - [ ] ComparisonBlock
      - [ ] DefinitionBlock
      - [ ] RolesBlock

@@ -386,7 +386,40 @@
 - Добавлены: tests/unit/blocks/specialized/diagram-block.test.js
 **Результат:** Редактор поддерживает блок диаграмм с метаданными, исходным кодом и предпросмотром; тип полностью интегрирован в систему и покрыт тестами
 
+### Шаг 22: PlantUMLBlock — специализация для PlantUML ✅
+**Дата:** 2025-11-07 22:35
+**Что сделано:**
+- Реализован `PlantUMLBlock` с поддержкой серверов рендера, форматов изображений и исходного кода диаграмм
+- Зарегистрирован новый тип, добавлен пример в демонстрационный документ и настроены стили предпросмотра и исходника
+- Добавлены unit-тесты и обновлен тест-раннер, включена регистрация в initializeBlocks
+**Файлы:**
+- editor/src/blocks/specialized/PlantUMLBlock.js
+- editor/src/blocks/specialized/index.js
+- editor/src/blocks/initializeBlocks.js
+- editor/src/app.js
+- editor/styles/main.css
+- editor/tests/unit/blocks/specialized/plantuml-block.test.js
+- editor/tests/unit/blocks/initialize-blocks.test.js
+- editor/tests/test-runner-init.js
+**Тесты:**
+- Добавлены: tests/unit/blocks/specialized/plantuml-block.test.js
+**Результат:** PlantUML диаграммы отображаются в редакторе с метаданными, исходным кодом и предпросмотром; тип полностью интегрирован и покрыт тестами
+
+### Шаг 23: Исправление асинхронной загрузки PlantUML диаграмм ✅
+**Дата:** 2025-11-07 22:50
+**Что сделано:**
+- Добавлен флаг `_isGenerating` для отслеживания состояния генерации URL
+- Реализован спиннер с анимацией для индикации загрузки диаграммы
+- Добавлена обработка ошибок при генерации и загрузке изображения
+- Улучшен UX: теперь пользователь видит анимированный спиннер во время загрузки библиотеки pako и генерации URL
+**Файлы:**
+- editor/src/blocks/specialized/PlantUMLBlock.js
+- editor/styles/main.css
+**Тесты:**
+- Существующие тесты продолжают работать
+**Результат:** PlantUML диаграммы корректно загружаются при первом рендере с визуальной индикацией процесса
+
 ## Следующие шаги:
-- Специализированные блоки (Comparison, PlantUML, Action, Definition, Roles)
+- Специализированные блоки (Comparison, Action, Definition, Roles)
 - Блоки для работы с таблицами (TableBlock с расширенным функционалом)
 - Система плагинов
