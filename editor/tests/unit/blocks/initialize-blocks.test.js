@@ -28,6 +28,7 @@ suite.test('registers all content block types', () => {
   Assert.isDefined(registry.get('image'));
   Assert.isDefined(registry.get('table'));
   Assert.isDefined(registry.get('checklist'));
+  Assert.isDefined(registry.get('steps'));
 });
 
 suite.test('registers all structure block types', () => {

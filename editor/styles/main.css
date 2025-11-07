@@ -1528,15 +1528,44 @@ plantuml-viewer-diagram {
    Стили для блока пошаговой инструкции
    ========================================================================== */
 
-steps-block {
+.steps-block {
     margin: var(--spacing-lg) 0;
     counter-reset: step-counter;
+}
+
+.steps-title {
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-color);
+}
+
+.steps-empty {
+    font-style: italic;
+    color: rgba(45, 55, 72, 0.6);
+}
+
+.steps-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
 }
 
 .step-item {
     display: flex;
     margin-bottom: var(--spacing-md);
     counter-increment: step-counter;
+}
+
+.step-item[data-status="done"] .step-number {
+    background-color: var(--success-color);
+}
+
+.step-item[data-status="active"] .step-number {
+    background-color: var(--accent-color);
+    box-shadow: 0 0 0 4px rgba(49, 130, 206, 0.15);
 }
 
 .step-number {
@@ -1550,7 +1579,39 @@ steps-block {
     align-items: center;
     justify-content: center;
     margin-right: var(--spacing-md);
-    /*font-weight: bold;*/
+    font-weight: 600;
+}
+
+.step-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.step-title {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.step-status {
+    display: inline-block;
+    font-size: var(--font-size-xs);
+    color: var(--accent-color);
+    background: rgba(49, 130, 206, 0.12);
+    border-radius: var(--border-radius);
+    padding: 2px 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.step-item[data-status="done"] .step-status {
+    color: var(--success-color);
+    background: rgba(56, 161, 105, 0.12);
+}
+
+.step-description {
+    font-size: var(--font-size-sm);
+    color: rgba(45, 55, 72, 0.75);
 }
 
 /* ==========================================================================

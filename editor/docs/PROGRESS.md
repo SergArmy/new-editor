@@ -348,7 +348,26 @@
 - Добавлены: tests/unit/blocks/specialized/checklist-block.test.js
 **Результат:** В редакторе доступен новый блок чеклиста с базовым прогрессом и стилизацией; блок корректно сериализуется и покрыт тестами
 
+### Шаг 20: StepsBlock — блок пошаговой инструкции ✅
+**Дата:** 2025-11-07 21:40
+**Что сделано:**
+- Создан класс `StepsBlock` с поддержкой статусов шагов, описаний и автоматической нумерации
+- Зарегистрирован новый тип блока и добавлен в демонстрационный документ редактора
+- Добавлены unit-тесты, обновлены стили и справочная документация проекта
+**Файлы:**
+- editor/src/blocks/specialized/StepsBlock.js
+- editor/src/blocks/specialized/index.js
+- editor/src/blocks/initializeBlocks.js
+- editor/src/app.js
+- editor/styles/main.css
+- editor/tests/unit/blocks/specialized/steps-block.test.js
+- editor/tests/unit/blocks/initialize-blocks.test.js
+- editor/tests/test-runner-init.js
+**Тесты:**
+- Добавлены: tests/unit/blocks/specialized/steps-block.test.js
+**Результат:** В редакторе доступен блок пошаговой инструкции с визуальными статусами; блок зарегистрирован в системе и демонстрационном документе, покрыт тестами и стилизован
+
 ## Следующие шаги:
-- Специализированные блоки (Comparison, Diagram, PlantUML, Action, Steps, Definition, Roles)
+- Специализированные блоки (Comparison, Diagram, PlantUML, Action, Definition, Roles)
 - Блоки для работы с таблицами (TableBlock с расширенным функционалом)
 - Система плагинов

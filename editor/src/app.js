@@ -232,6 +232,35 @@ function createTestDocument() {
                         { id: 'checklist-item-3', text: 'Экспортировать в HTML', checked: false }
                     ]
                 }
+            },
+            {
+                id: 'block-7',
+                type: 'steps',
+                position: 6,
+                parentId: null,
+                protected: false,
+                data: {
+                    title: 'Шаги подготовки релиза',
+                    steps: [
+                        {
+                            id: 'step-1',
+                            title: 'Сбор требований',
+                            description: 'Убедитесь, что все задачи попали в релиз и задокументированы.',
+                            status: 'done'
+                        },
+                        {
+                            id: 'step-2',
+                            title: 'Регрессионное тестирование',
+                            description: 'Запустите тест-раннер и проведите ручной прогон критичных сценариев.',
+                            status: 'active'
+                        },
+                        {
+                            id: 'step-3',
+                            title: 'Деплой и проверка',
+                            description: 'Выполните выкладку на стенд и подтвердите корректность работы.'
+                        }
+                    ]
+                }
             }
         ]
     });

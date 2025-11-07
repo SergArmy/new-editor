@@ -9,6 +9,7 @@ import { CodeBlock } from './content/CodeBlock.js';
 import { ImageBlock } from './content/ImageBlock.js';
 import { TableBlock } from './content/TableBlock.js';
 import { ChecklistBlock } from './specialized/ChecklistBlock.js';
+import { StepsBlock } from './specialized/StepsBlock.js';
 
 import { SectionBlock } from './structure/SectionBlock.js';
 import { HeaderBlock } from './structure/HeaderBlock.js';
@@ -33,6 +34,7 @@ export function initializeBlocks() {
   registry.register('image', ImageBlock);
   registry.register('table', TableBlock);
   registry.register('checklist', ChecklistBlock);
+  registry.register('steps', StepsBlock);
 
   // Регистрируем структурные блоки
   registry.register('section', SectionBlock);

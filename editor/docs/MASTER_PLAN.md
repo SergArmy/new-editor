@@ -35,7 +35,7 @@ Legend: [x] — выполнено, [ ] — в работе/запланиров
    - [x] Text/Code/Image/Table/Quote — Completed At: 2025-01-XX
    - [~] Специализированные блоки (Checklist, Steps, Diagram, PlantUML, Comparison, Definition, Roles, Action) — In Progress: 2025-11-07 21:00
      - [x] ChecklistBlock — Completed At: 2025-11-07 21:00
-     - [ ] StepsBlock
+     - [x] StepsBlock — Completed At: 2025-11-07 21:40
      - [ ] DiagramBlock
      - [ ] PlantUMLBlock
      - [ ] ComparisonBlock
