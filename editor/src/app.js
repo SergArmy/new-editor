@@ -261,6 +261,30 @@ function createTestDocument() {
                         }
                     ]
                 }
+            },
+            {
+                id: 'block-8',
+                type: 'diagram',
+                position: 7,
+                parentId: null,
+                protected: false,
+                data: {
+                    title: 'Схема обработки запроса',
+                    description: 'Последовательность взаимодействия сервисов при выполнении операции сохранения документа.',
+                    engine: 'plantuml',
+                    theme: 'default',
+                    renderUrl: '',
+                    source: `@startuml
+actor User
+User -> UI: Создает документ
+UI -> EditorCore: serialize()
+EditorCore -> ApiClient: POST /documents
+ApiClient -> Storage: save(document)
+Storage --> ApiClient: 201 Created
+ApiClient --> EditorCore: response
+EditorCore --> UI: notify success
+@enduml`
+                }
             }
         ]
     });

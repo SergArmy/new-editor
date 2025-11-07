@@ -367,7 +367,26 @@
 - Добавлены: tests/unit/blocks/specialized/steps-block.test.js
 **Результат:** В редакторе доступен блок пошаговой инструкции с визуальными статусами; блок зарегистрирован в системе и демонстрационном документе, покрыт тестами и стилизован
 
+### Шаг 21: DiagramBlock — визуализация диаграмм ✅
+**Дата:** 2025-11-07 22:05
+**Что сделано:**
+- Реализован `DiagramBlock` с поддержкой PlantUML/Mermaid-данных, предпросмотра и блока исходного кода
+- Зарегистрирован новый тип блока, увеличен тестовый документ примером диаграммы
+- Добавлены unit-тесты и стили для заголовка, превью и исходников диаграммы
+**Файлы:**
+- editor/src/blocks/specialized/DiagramBlock.js
+- editor/src/blocks/specialized/index.js
+- editor/src/blocks/initializeBlocks.js
+- editor/src/app.js
+- editor/styles/main.css
+- editor/tests/unit/blocks/specialized/diagram-block.test.js
+- editor/tests/unit/blocks/initialize-blocks.test.js
+- editor/tests/test-runner-init.js
+**Тесты:**
+- Добавлены: tests/unit/blocks/specialized/diagram-block.test.js
+**Результат:** Редактор поддерживает блок диаграмм с метаданными, исходным кодом и предпросмотром; тип полностью интегрирован в систему и покрыт тестами
+
 ## Следующие шаги:
-- Специализированные блоки (Comparison, Diagram, PlantUML, Action, Definition, Roles)
+- Специализированные блоки (Comparison, PlantUML, Action, Definition, Roles)
 - Блоки для работы с таблицами (TableBlock с расширенным функционалом)
 - Система плагинов
