@@ -330,7 +330,25 @@
 - Все проверки пройдены: text-block ✅, code-block ✅, table-block ✅, CSS ✅, copy script ✅
 **Результат:** Экспорт HTML теперь использует архитектуру на основе паттерна Strategy, что обеспечивает изоляцию логики каждого типа блока, упрощает тестирование и добавление новых типов. CSS оптимизирован через CssExtractor, который извлекает только используемые правила, что сократило размер экспортируемых файлов в 5-10 раз. Каждая стратегия возвращает список используемых классов, что позволяет точно определить необходимые стили.
 
+### Шаг 19: ChecklistBlock — специализированный блок ✅
+**Дата:** 2025-11-07 21:00
+**Что сделано:**
+- Реализован класс `ChecklistBlock` с поддержкой заголовка, прогресса и описаний пунктов
+- Зарегистрирован новый тип блока в инициализации и создан экспорт специализированных блоков
+- Добавлены unit-тесты и расширены стили для отображения чеклиста
+**Файлы:**
+- editor/src/blocks/specialized/ChecklistBlock.js
+- editor/src/blocks/specialized/index.js
+- editor/src/blocks/initializeBlocks.js
+- editor/tests/unit/blocks/specialized/checklist-block.test.js
+- editor/tests/unit/blocks/initialize-blocks.test.js
+- editor/tests/test-runner-init.js
+- editor/styles/main.css
+**Тесты:**
+- Добавлены: tests/unit/blocks/specialized/checklist-block.test.js
+**Результат:** В редакторе доступен новый блок чеклиста с базовым прогрессом и стилизацией; блок корректно сериализуется и покрыт тестами
+
 ## Следующие шаги:
-- Специализированные блоки (Comparison, Diagram, PlantUML, Checklist, Action, Steps, Definition, Roles)
+- Специализированные блоки (Comparison, Diagram, PlantUML, Action, Steps, Definition, Roles)
 - Блоки для работы с таблицами (TableBlock с расширенным функционалом)
 - Система плагинов

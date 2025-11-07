@@ -216,6 +216,22 @@ function createTestDocument() {
                 data: {
                     text: 'Блок 5: При перетаскивании вы увидите визуальные индикаторы зон вставки между блоками.'
                 }
+            },
+            {
+                id: 'block-6',
+                type: 'checklist',
+                position: 5,
+                parentId: null,
+                protected: false,
+                data: {
+                    title: 'Чеклист запуска проекта',
+                    showProgress: true,
+                    items: [
+                        { id: 'checklist-item-1', text: 'Проверить автосохранение', checked: true },
+                        { id: 'checklist-item-2', text: 'Протестировать Drag & Drop', checked: false },
+                        { id: 'checklist-item-3', text: 'Экспортировать в HTML', checked: false }
+                    ]
+                }
             }
         ]
     });

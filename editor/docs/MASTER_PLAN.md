@@ -33,7 +33,15 @@ Legend: [x] — выполнено, [ ] — в работе/запланиров
 4. Блоки (Группы 4–5)
    - [x] Section/Header/Footer/ToC — Completed At: 2025-01-XX
    - [x] Text/Code/Image/Table/Quote — Completed At: 2025-01-XX
-   - [ ] Специализированные блоки (Checklist, Steps, Diagram, PlantUML, Comparison, Definition, Roles, Action)
+   - [~] Специализированные блоки (Checklist, Steps, Diagram, PlantUML, Comparison, Definition, Roles, Action) — In Progress: 2025-11-07 21:00
+     - [x] ChecklistBlock — Completed At: 2025-11-07 21:00
+     - [ ] StepsBlock
+     - [ ] DiagramBlock
+     - [ ] PlantUMLBlock
+     - [ ] ComparisonBlock
+     - [ ] DefinitionBlock
+     - [ ] RolesBlock
+     - [ ] ActionBlock
 
 5. Команды (Группа 9)
    - [x] SlashCommands: меню, поиск, навигация, исполнение — Completed At: 2025-01-XX

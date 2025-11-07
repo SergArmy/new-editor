@@ -1455,6 +1455,24 @@ plantuml-viewer-diagram {
     margin: var(--spacing-lg) 0;
 }
 
+.checklist-title {
+    font-weight: 600;
+    margin-bottom: var(--spacing-sm);
+    color: var(--text-color);
+}
+
+.checklist-progress {
+    font-size: var(--font-size-sm);
+    color: rgba(45, 55, 72, 0.7);
+    margin-bottom: var(--spacing-sm);
+}
+
+.checklist-items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
 .checklist-item {
     display: flex;
     align-items: flex-start;
@@ -1464,6 +1482,27 @@ plantuml-viewer-diagram {
 .checklist-item input[type="checkbox"] {
     margin-right: var(--spacing-md);
     margin-top: var(--spacing-xs);
+}
+
+.checklist-item-content {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.checklist-item-label {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.checklist-item-description {
+    font-size: var(--font-size-sm);
+    color: rgba(45, 55, 72, 0.75);
+}
+
+.checklist-empty {
+    font-style: italic;
+    color: rgba(45, 55, 72, 0.6);
 }
 
 /* ==========================================================================
