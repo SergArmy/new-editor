@@ -163,7 +163,7 @@ export class IconLibraryService {
 
     const normalized = {
       label: icon?.label?.trim(),
-      value: icon?.value?.trim()
+      value: normalizeIconValue(icon?.value)
     };
 
     if (!normalized.value) {
@@ -292,6 +292,52 @@ export function getBuiltinGroups() {
     source: 'builtin',
     icons: group.icons.map(icon => ({ ...icon, source: 'builtin' }))
   }));
+}
+
+export function normalizeIconValue(raw) {
+  if (!raw) {
+    return '';
+  }
+
+  const tokens = raw
+    .split(/\s+/g)
+    .map(token => token.trim())
+    .filter(Boolean);
+
+  if (tokens.length === 0) {
+    return '';
+  }
+
+  const weightTokens = new Set([
+    'fa',
+    'fa-solid',
+    'fa-regular',
+    'fa-thin',
+    'fa-duotone',
+    'fa-brands',
+    'fa-sharp',
+    'fa-light'
+  ]);
+
+  const unique = [];
+  tokens.forEach(token => {
+    const lower = token.toLowerCase();
+    if (lower === 'fa-light') {
+      return;
+    }
+    if (weightTokens.has(lower)) {
+      return;
+    }
+    if (!unique.includes(token)) {
+      unique.push(token);
+    }
+  });
+
+  if (unique.length === 0) {
+    return '';
+  }
+
+  return ['fa-light', ...unique].join(' ');
 }
 
 

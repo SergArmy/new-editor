@@ -4,5 +4,7 @@ export { DiagramBlock } from './DiagramBlock.js';
 export { PlantUMLBlock } from './PlantUMLBlock.js';
 export { ComparisonBlock } from './ComparisonBlock.js';
 export { DefinitionBlock } from './DefinitionBlock.js';
+export { ActionBlock } from './ActionBlock.js';
+export { RolesBlock } from './RolesBlock.js';
 
 

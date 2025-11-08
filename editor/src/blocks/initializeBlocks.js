@@ -14,6 +14,8 @@ import { DiagramBlock } from './specialized/DiagramBlock.js';
 import { PlantUMLBlock } from './specialized/PlantUMLBlock.js';
 import { ComparisonBlock } from './specialized/ComparisonBlock.js';
 import { DefinitionBlock } from './specialized/DefinitionBlock.js';
+import { ActionBlock } from './specialized/ActionBlock.js';
+import { RolesBlock } from './specialized/RolesBlock.js';
 
 import { SectionBlock } from './structure/SectionBlock.js';
 import { HeaderBlock } from './structure/HeaderBlock.js';
@@ -43,6 +45,8 @@ export function initializeBlocks() {
   registry.register('plantuml', PlantUMLBlock);
   registry.register('comparison', ComparisonBlock);
   registry.register('definition', DefinitionBlock);
+  registry.register('action', ActionBlock);
+  registry.register('roles', RolesBlock);
 
   // Регистрируем структурные блоки
   registry.register('section', SectionBlock);

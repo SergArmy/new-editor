@@ -1331,41 +1331,79 @@ body {
     color: var(--success-color);
 }
 
-.icon-picker-custom {
+.icon-picker-actions {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm);
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-radius: var(--border-radius-md);
+}
+
+.icon-picker-actions__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+}
+
+.icon-picker-actions__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.icon-picker-actions__btn i {
+    font-size: 14px;
+}
+
+.icon-picker-actions__hint {
+    font-size: var(--font-size-xs);
+    opacity: 0.7;
+}
+
+.icon-picker-custom-dialog {
+    min-width: 360px;
+    max-width: 420px;
+    gap: var(--spacing-sm);
+}
+
+.icon-picker-custom-dialog__preview {
+    width: 56px;
+    height: 56px;
+    border-radius: 12px;
     background: rgba(15, 23, 42, 0.5);
-    border: 1px solid rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: rgba(226, 232, 240, 0.95);
 }
 
-.icon-picker-custom__title {
-    font-size: var(--font-size-sm);
-    font-weight: 600;
+.icon-picker-custom-dialog__preview-placeholder {
+    opacity: 0.4;
 }
 
-.icon-picker-custom__fields {
+.icon-picker-custom-dialog__fields {
     display: grid;
     gap: var(--spacing-sm);
 }
 
-.icon-picker-custom__actions {
+.icon-picker-custom-dialog__message {
+    min-height: 20px;
+    font-size: var(--font-size-xs);
+    opacity: 0.85;
+}
+
+.icon-picker-custom-dialog__message.is-error {
+    color: var(--danger-color);
+}
+
+.icon-picker-custom-dialog__message.is-success {
+    color: var(--success-color);
+}
+
+.icon-picker-custom-dialog__actions {
     display: flex;
     justify-content: flex-end;
     gap: var(--spacing-sm);
-}
-
-.icon-picker-custom__actions .diagram-link-editor__btn.secondary {
-    background: rgba(15, 23, 42, 0.35);
-    border-color: rgba(148, 163, 184, 0.3);
-}
-
-.icon-picker-custom__actions .diagram-link-editor__btn.secondary.is-success {
-    background: rgba(34, 197, 94, 0.25);
-    border-color: rgba(34, 197, 94, 0.45);
-    color: rgba(34, 197, 94, 0.95);
 }
 
 @media (max-width: 920px) {
@@ -2177,6 +2215,8 @@ body {
 .diagram-link-editor.icon-picker-menu {
     min-width: 920px;
     max-width: 1040px;
+    max-height: calc(95vh - 24px);
+    overflow-y: auto;
 }
 
 .diagram-link-context-menu {
