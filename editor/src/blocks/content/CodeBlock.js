@@ -12,6 +12,7 @@ export class CodeBlock extends Block {
    */
   static SUPPORTED_LANGUAGES = [
     { id: 'bsl', label: '1С (BSL)', aliases: ['1c', '1C'] },
+    { id: 'plantuml', label: 'PlantUML', aliases: ['puml', 'plant-uml'] },
     { id: 'javascript', label: 'JavaScript' },
     { id: 'json', label: 'JSON' },
     { id: 'xml', label: 'XML' },
@@ -91,6 +92,10 @@ export class CodeBlock extends Block {
     // Проверяем алиасы для 1С
     if (['1c', '1с'].includes(normalized)) {
       return 'bsl';
+    }
+
+    if (['plantuml', 'puml', 'plant-uml'].includes(normalized)) {
+      return 'plantuml';
     }
 
     // Проверяем, есть ли язык в списке поддерживаемых
@@ -251,7 +256,11 @@ export class CodeBlock extends Block {
     dropdown.className = 'code-language-dropdown';
     dropdown.style.display = 'none';
 
-    CodeBlock.SUPPORTED_LANGUAGES.forEach(lang => {
+    const sortedLanguages = [...CodeBlock.SUPPORTED_LANGUAGES].sort((a, b) =>
+      a.label.localeCompare(b.label, 'ru-RU')
+    );
+
+    sortedLanguages.forEach(lang => {
       const item = document.createElement('button');
       item.className = 'code-language-item';
       item.textContent = lang.label;

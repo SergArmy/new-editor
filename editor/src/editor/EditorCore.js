@@ -159,7 +159,7 @@ export class EditorCore {
         console.log('⌨️ Keyboard event:', e.key, 'code:', code, 'activeElement:', activeElement?.tagName);
       }
 
-      const isContentEditableElement = activeElement && activeElement.isContentEditable === true && activeElement !== this.container;
+      const isNativeEditingContext = this._isNativeTextEditingContext(activeElement);
       const isActiveInEditor = () => {
         return this.container.contains(activeElement) ||
           activeElement === this.container ||
@@ -177,7 +177,7 @@ export class EditorCore {
 
       // Обработка Undo (Ctrl/Cmd + Z без Shift)
       if (isModifierPressed && !e.shiftKey && !e.altKey && isUndoKey) {
-        if (isContentEditableElement) {
+        if (isNativeEditingContext) {
           return; // не перехватываем, если редактируется текст
         }
 
@@ -198,7 +198,7 @@ export class EditorCore {
       );
 
       if (isRedoShortcut) {
-        if (isContentEditableElement) {
+        if (isNativeEditingContext) {
           return; // не перехватываем, если редактируется текст
         }
 
@@ -227,7 +227,7 @@ export class EditorCore {
       // Ctrl+C или Cmd+C - копирование (используем e.code для независимости от раскладки)
       if (isModifierPressed && isCopyKey && !e.shiftKey && !e.altKey) {
         // Проверяем, не редактируется ли текстовый блок
-        if (isContentEditableElement) {
+        if (isNativeEditingContext) {
           // Если редактируется текстовый блок, не перехватываем (стандартное копирование текста)
           console.log('Clipboard: skipping - contentEditable element');
           return;
@@ -253,7 +253,7 @@ export class EditorCore {
       // Ctrl+V или Cmd+V - вставка (используем e.code для независимости от раскладки)
       if (isModifierPressed && isPasteKey && !e.shiftKey && !e.altKey) {
         // Проверяем, не редактируется ли текстовый блок
-        if (isContentEditableElement) {
+        if (isNativeEditingContext) {
           // Если редактируется текстовый блок, не перехватываем (стандартная вставка текста)
           return;
         }
@@ -275,7 +275,7 @@ export class EditorCore {
       // Esc - снятие выделения
       if (e.key === 'Escape' && !e.ctrlKey && !e.metaKey && !e.shiftKey && !e.altKey) {
         // Проверяем, не редактируется ли текстовый блок
-        if (activeElement && activeElement.isContentEditable && activeElement !== this.container) {
+        if (activeElement && this._isNativeTextEditingContext(activeElement)) {
           // Если редактируется текстовый блок, не перехватываем
           return;
         }
@@ -588,8 +588,7 @@ export class EditorCore {
           return;
         }
 
-        // Не перехватываем клики внутри contentEditable элементов
-        if (e.target.isContentEditable && e.target !== blockElement) {
+        if (this._shouldIgnoreBlockClick(e.target, blockElement)) {
           return;
         }
 
@@ -633,6 +632,83 @@ export class EditorCore {
 
     // Настраиваем глобальный обработчик dragover для определения активной зоны по координатам
     this._setupGlobalDragHandler();
+  }
+
+  /**
+   * Проверяет, следует ли игнорировать клик по блоку (например, если пользователь взаимодействует с вложенным редактором)
+   * @param {EventTarget} target
+   * @param {HTMLElement} blockElement
+   * @returns {boolean}
+   * @private
+   */
+  _shouldIgnoreBlockClick(target, blockElement) {
+    if (!(target instanceof Element)) {
+      return false;
+    }
+
+    if (target.isContentEditable && target !== blockElement) {
+      return true;
+    }
+
+    const interactiveTags = new Set(['INPUT', 'TEXTAREA', 'SELECT', 'BUTTON', 'LABEL']);
+    if (interactiveTags.has(target.tagName)) {
+      return true;
+    }
+
+    if (target.closest('.monaco-editor')) {
+      return true;
+    }
+
+    if (target.closest('.code-editor-container')) {
+      return true;
+    }
+
+    if (target.closest('.diagram-code-editor')) {
+      return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Проверяет, находится ли фокус в нативном текстовом/кодовом редакторе, где нужно оставить системное поведение
+   * @param {Element|null} element
+   * @returns {boolean}
+   * @private
+   */
+  _isNativeTextEditingContext(element) {
+    if (!element || element === this.container) {
+      return false;
+    }
+
+    if (element instanceof HTMLInputElement) {
+      const textTypes = new Set([
+        'text', 'search', 'url', 'tel', 'password', 'email', 'number'
+      ]);
+      return textTypes.has(element.type || 'text');
+    }
+
+    if (element instanceof HTMLTextAreaElement) {
+      return true;
+    }
+
+    if (element.isContentEditable) {
+      return true;
+    }
+
+    if (element.closest('.code-editor-container')) {
+      return true;
+    }
+
+    if (element.closest('.diagram-code-editor')) {
+      return true;
+    }
+
+    if (element.closest('.monaco-editor')) {
+      return true;
+    }
+
+    return false;
   }
 
   /**
@@ -1707,10 +1783,10 @@ export class EditorCore {
 
     // Сериализуем документ для экспорта
     const serializedDocument = DocumentSerializer.serialize(this.document);
-    
+
     // Экспортируем
     const result = await this.exportManager.export(serializedDocument, format, options);
-    
+
     // Эмитим событие экспорта
     if (this.eventBus) {
       this.eventBus.emit('document:exported', {

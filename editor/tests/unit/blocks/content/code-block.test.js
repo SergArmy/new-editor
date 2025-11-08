@@ -116,7 +116,15 @@ suite.test('language dropdown shows all supported languages', () => {
 
   // Проверяем, что в dropdown есть все поддерживаемые языки
   const items = dropdown.querySelectorAll('.code-language-item');
-  Assert.strictEqual(items.length, 7, 'Dropdown should have 7 language items');
+  Assert.strictEqual(items.length, 8, 'Dropdown should have 8 language items');
+
+  const labels = Array.from(items).map((item) => item.textContent.trim());
+  const sortedLabels = [...labels].sort((a, b) => a.localeCompare(b, 'ru-RU'));
+
+  Assert.strictEqual(labels.length, sortedLabels.length, 'Sorted list should keep the same length');
+  labels.forEach((label, index) => {
+    Assert.strictEqual(label, sortedLabels[index], `Language label at index ${index} should be alphabetically ordered`);
+  });
 
   // Проверяем, что текущий язык отмечен как активный
   const activeItem = dropdown.querySelector('.code-language-item.active');

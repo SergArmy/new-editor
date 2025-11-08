@@ -346,5 +346,35 @@ suite.test('moveBlock updates parentId and restores on undo', () => {
   Assert.strictEqual(doc.getBlock('b1').parentId, null);
 });
 
+suite.test('_isNativeTextEditingContext detects interactive editors', () => {
+  const editor = new EditorCore(dependencies, container);
+  editor.initialize();
+
+  const textarea = document.createElement('textarea');
+  const codeContainer = document.createElement('div');
+  codeContainer.className = 'code-editor-container';
+  codeContainer.appendChild(textarea);
+  container.appendChild(codeContainer);
+
+  Assert.isTrue(editor._isNativeTextEditingContext(textarea), 'Textarea should be treated as native editable context');
+  Assert.isTrue(editor._isNativeTextEditingContext(codeContainer), 'Code editor container should be treated as native editable context');
+
+  const monacoWrapper = document.createElement('div');
+  monacoWrapper.className = 'monaco-editor';
+  container.appendChild(monacoWrapper);
+  Assert.isTrue(editor._isNativeTextEditingContext(monacoWrapper), 'Monaco wrapper should be treated as native editable context');
+});
+
+suite.test('_isNativeTextEditingContext ignores editor shell elements', () => {
+  const editor = new EditorCore(dependencies, container);
+  editor.initialize();
+
+  Assert.isFalse(editor._isNativeTextEditingContext(container), 'Editor container should not be treated as native editable context');
+
+  const plainDiv = document.createElement('div');
+  container.appendChild(plainDiv);
+  Assert.isFalse(editor._isNativeTextEditingContext(plainDiv), 'Plain div should not be treated as native editable context');
+});
+
 export default suite;
 

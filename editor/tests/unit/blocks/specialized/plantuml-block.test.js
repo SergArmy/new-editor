@@ -22,9 +22,22 @@ suite.test('renders PlantUML block with metadata and source', () => {
   const el = block.render();
 
   Assert.isTrue(el.classList.contains('plantuml-block'));
-  Assert.strictEqual(el.querySelector('.plantuml-title').textContent, 'Компонентная диаграмма');
-  Assert.strictEqual(el.querySelector('.plantuml-meta').textContent.includes('plantuml.example.com'), true);
-  Assert.strictEqual(el.querySelector('.plantuml-source code').textContent.includes('Alice -> Bob'), true);
+  const titleEl = el.querySelector('.diagram-title');
+  Assert.isNotNull(titleEl);
+  Assert.strictEqual(titleEl.textContent, 'Компонентная диаграмма');
+
+  const metaEl = el.querySelector('.diagram-meta');
+  Assert.isNotNull(metaEl);
+  Assert.strictEqual(metaEl.textContent, 'PLANTUML · SVG');
+
+  const codeBlockEl = el.querySelector('.code-block');
+  Assert.isNotNull(codeBlockEl);
+  const textarea = codeBlockEl.querySelector('textarea');
+  if (textarea) {
+    Assert.isTrue(textarea.value.includes('Alice -> Bob'));
+  } else {
+    Assert.isTrue(codeBlockEl.textContent.includes('Alice -> Bob'));
+  }
 });
 
 suite.test('toJSON returns PlantUML metadata', () => {
@@ -41,7 +54,7 @@ suite.test('toJSON returns PlantUML metadata', () => {
   const json = block.toJSON();
 
   Assert.strictEqual(json.format, 'png');
-  Assert.strictEqual(json.source.includes('@startuml'), true);
+  Assert.isTrue(json.source.includes('@startuml'));
   Assert.strictEqual(json.title, '');
 });
 

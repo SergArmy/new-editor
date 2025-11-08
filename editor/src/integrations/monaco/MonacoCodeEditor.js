@@ -1,6 +1,60 @@
 import { monacoLoader } from './MonacoLoader.js';
 import { register1CLanguage } from './OneCLanguageConfig.js';
+import { registerPlantUmlLanguage } from './PlantUMLLanguageConfig.js';
 import { logger } from '../../utils/logger.js';
+
+const registeredLanguages = new Set();
+
+const LANGUAGE_REGISTRARS = {
+  bsl: register1CLanguage,
+  plantuml: registerPlantUmlLanguage
+};
+
+/**
+ * Нормализует идентификатор языка до значения, пригодного для Monaco.
+ * @param {string} language
+ * @returns {string}
+ */
+function normalizeLanguageId(language) {
+  if (!language) {
+    return 'plaintext';
+  }
+
+  const value = language.toLowerCase();
+
+  if (['1c', '1с', 'bsl', 'bsllanguage'].includes(value)) {
+    return 'bsl';
+  }
+
+  if (['plantuml', 'puml', 'plant-uml'].includes(value)) {
+    return 'plantuml';
+  }
+
+  return value;
+}
+
+/**
+ * Регистрирует язык, если требуется, и возвращает нормализованный идентификатор.
+ * @param {any} monaco
+ * @param {string} language
+ * @returns {string}
+ */
+function ensureLanguageRegistered(monaco, language) {
+  const normalized = normalizeLanguageId(language);
+
+  if (!monaco) {
+    return normalized;
+  }
+
+  const registrar = LANGUAGE_REGISTRARS[normalized];
+  if (registrar && !registeredLanguages.has(normalized)) {
+    registrar(monaco);
+    registeredLanguages.add(normalized);
+    logger.log(`Monaco language registered: ${normalized}`);
+  }
+
+  return normalized;
+}
 
 /**
  * @class MonacoCodeEditor
@@ -24,7 +78,7 @@ export class MonacoCodeEditor {
     /** @type {Object} */
     this.options = {
       value: options.value || '',
-      language: options.language || 'javascript',
+      language: normalizeLanguageId(options.language || 'javascript'),
       theme: options.theme || 'vs',
       readOnly: options.readOnly || false,
       lineNumbers: options.lineNumbers !== false ? 'on' : 'off',
@@ -41,9 +95,6 @@ export class MonacoCodeEditor {
 
     /** @type {boolean} */
     this.isInitialized = false;
-
-    /** @type {boolean} */
-    this.languageRegistered = false;
   }
 
   /**
@@ -60,18 +111,8 @@ export class MonacoCodeEditor {
       // Загружаем Monaco
       const monaco = await monacoLoader.load();
 
-      // Регистрируем язык 1С (BSL), если еще не зарегистрирован
-      const is1CLanguage = ['1c', 'bsl', 'BSL', '1C'].includes(this.options.language);
-      if (!this.languageRegistered && is1CLanguage) {
-        register1CLanguage(monaco);
-        this.languageRegistered = true;
-        logger.log('1C (BSL) language registered in Monaco');
-
-        // Нормализуем язык к 'bsl'
-        if (this.options.language !== 'bsl') {
-          this.options.language = 'bsl';
-        }
-      }
+      // Регистрируем специфические языки, если требуется
+      this.options.language = ensureLanguageRegistered(monaco, this.options.language);
 
       // Создаем редактор
       this.editor = monaco.editor.create(this.container, this.options);
@@ -119,27 +160,25 @@ export class MonacoCodeEditor {
    */
   async setLanguage(language) {
     if (!this.editor) {
-      this.options.language = language;
+      this.options.language = normalizeLanguageId(language);
       return;
     }
 
     // Если язык 1С (BSL) и он еще не зарегистрирован
-    const is1CLanguage = ['1c', 'bsl', 'BSL', '1C'].includes(language);
-    if (is1CLanguage) {
-      const monaco = monacoLoader.getMonaco();
-      if (monaco && !this.languageRegistered) {
-        register1CLanguage(monaco);
-        this.languageRegistered = true;
-      }
-      // Нормализуем к 'bsl'
-      language = 'bsl';
+    const normalized = normalizeLanguageId(language);
+    const monaco = monacoLoader.getMonaco();
+    const languageId = ensureLanguageRegistered(monaco, normalized);
+
+    if (!monaco) {
+      this.options.language = languageId;
+      return;
     }
 
     const model = this.editor.getModel();
     if (model) {
-      const monaco = monacoLoader.getMonaco();
-      monaco.editor.setModelLanguage(model, language);
+      monaco.editor.setModelLanguage(model, languageId);
     }
+    this.options.language = languageId;
   }
 
   /**
