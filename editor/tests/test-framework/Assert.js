@@ -5,6 +5,9 @@ export class Assert {
   static strictEqual(actual, expected, message) {
     if (actual !== expected) throw new Error(message || `Expected ${actual} === ${expected}`);
   }
+  static notStrictEqual(actual, expected, message) {
+    if (actual === expected) throw new Error(message || `Expected ${actual} !== ${expected}`);
+  }
   static isTrue(value, message) {
     if (value !== true) throw new Error(message || `Expected true, got ${value}`);
   }

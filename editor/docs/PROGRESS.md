@@ -727,7 +727,96 @@
 - Обновлены: editor/tests/unit/blocks/initialize-blocks.test.js, editor/tests/test-runner-init.js
 **Результат:** Редактор поддерживает минималистичный DefinitionBlock с терминами и текстом, пример доступен в демо-документе, а покрытие тестами сохранено.
 
+### Шаг 43: ActionBlock — карточка действий ✅
+**Дата:** 2025-11-08 22:55
+**Что сделано:**
+- Создан блок `ActionBlock` для оформления действий с ожидаемым результатом и списком шагов
+- Добавлены стили карточки с акцентом на результат и компактным списком шагов
+- Обновлён демонстрационный документ примером ActionBlock и добавлены юнит-тесты
+**Файлы:**
+- editor/src/blocks/specialized/ActionBlock.js
+- editor/src/blocks/initializeBlocks.js
+- editor/src/blocks/specialized/index.js
+- editor/src/app.js
+- editor/styles/main.css
+- editor/tests/unit/blocks/specialized/action-block.test.js
+- editor/tests/unit/blocks/initialize-blocks.test.js
+- editor/tests/test-runner-init.js
+**Тесты:**
+- Добавлены: editor/tests/unit/blocks/specialized/action-block.test.js
+- Обновлены: editor/tests/unit/blocks/initialize-blocks.test.js, editor/tests/test-runner-init.js
+**Результат:** В редакторе появился ActionBlock с ожидаемым результатом и шагами действий, пример доступен в демо-документе, функциональность покрыта тестами.
+
+### Шаг 44: RolesBlock — роли и ответственности ✅
+**Дата:** 2025-11-08 23:15
+**Что сделано:**
+- Реализован `RolesBlock` с описанием ролей, контактов и обязанностей
+- Добавлены стили для оформления карточки ролей и их списка
+- Обновлён демо-документ примером RolesBlock, написаны юнит-тесты и обновлён тест-раннер
+**Файлы:**
+- editor/src/blocks/specialized/RolesBlock.js
+- editor/src/blocks/initializeBlocks.js
+- editor/src/blocks/specialized/index.js
+- editor/src/app.js
+- editor/styles/main.css
+- editor/tests/unit/blocks/specialized/roles-block.test.js
+- editor/tests/unit/blocks/initialize-blocks.test.js
+- editor/tests/test-runner-init.js
+**Тесты:**
+- Добавлены: editor/tests/unit/blocks/specialized/roles-block.test.js
+- Обновлены: editor/tests/unit/blocks/initialize-blocks.test.js, editor/tests/test-runner-init.js
+**Результат:** Редактор поддерживает RolesBlock с контактами и обязанностями ролей, пример доступен в демо-документе, блок покрыт тестами.
+
+### Шаг 45: RolesBlock — цветовые бейджи и реестр ролей ✅
+**Дата:** 2025-11-09 00:05
+**Что сделано:**
+- Добавлены цветные бейджи ролей с уникальным цветом при создании и возможностью смены через контекстное меню и палитру
+- Создан компонент `ColorPaletteMenu` и общий `RolesRegistry` для накопления информации о ролях
+- Обновлены стили RolesBlock, интегрирована палитра и учтён экспорт цветов в сериализации и тестах
+**Файлы:**
+- editor/src/blocks/specialized/RolesBlock.js
+- editor/src/registry/RolesRegistry.js
+- editor/src/ui/components/ColorPaletteMenu.js
+- editor/src/ui/components/index.js
+- editor/src/app.js
+- editor/styles/main.css
+- editor/tests/unit/blocks/specialized/roles-block.test.js
+**Тесты:**
+- Обновлены: editor/tests/unit/blocks/specialized/roles-block.test.js
+**Результат:** Роли отображаются минималистичными цветными бейджами с контекстным выбором цвета; данные о ролях аккумулируются в реестре для дальнейшего использования.
+
+### Шаг 46: IconPicker — расширение контекстного меню ✅
+**Дата:** 2025-11-09 00:20
+**Что сделано:**
+- Увеличена базовая ширина меню выбора иконок для лучшего обзора групп
+- Сохранены адаптивные брейкпоинты (3/2/1 колонка) с обновлёнными порогами
+- Обновлена высота области прокрутки для комфортной навигации
+- Обновлено 2025-11-09 00:25: убраны внутренние скроллы, меню вмещает все иконки и расширено до 920–1040px
+- Обновлено 2025-11-09 00:35: принудительно переопределены ограничения `.diagram-link-editor`, чтобы IconPicker использовал расширенную ширину
+**Файлы:**
+- editor/styles/main.css
+**Тесты:**
+- Не запускались (визуальное изменение)
+**Результат:** Контекстное меню IconPicker отображает больше иконок одновременно и удобнее прокручивается.
+
+### Шаг 47: Стабилизация ComparisonBlock и IconLibrary ✅
+**Дата:** 2025-11-09 00:35
+**Что сделано:**
+- Исправлен рендеринг кодовых секций ComparisonBlock: diff-класс применяется колонке «После», тексты сохраняют стили
+- Обновлены стили блоков сравнения, чтобы обе стороны с кодом имели единое оформление
+- Добавлен Assert.notStrictEqual для тестового фреймворка, что разблокировало тест RolesBlock
+- IconLibraryService клонирует пользовательские иконки и предотвращает дубли при повторном добавлении одного класса
+**Файлы:**
+- editor/src/blocks/specialized/ComparisonBlock.js
+- editor/styles/main.css
+- editor/tests/test-framework/Assert.js
+- editor/src/ui/icon-library/IconLibraryService.js
+**Тесты:**
+- Не запускались (для проверки требуется testrunner.html)
+**Результат:** Юнит-тесты ComparisonBlock, RolesBlock и IconLibraryService больше не падают из-за регрессий.
+
 ## Следующие шаги:
-- Специализированные блоки (Comparison, Action, Roles)
+- Специализированные блоки (Action, Roles)
+- Использование RolesRegistry в сценариях проекта
 - Блоки для работы с таблицами (TableBlock с расширенным функционалом)
 - Система плагинов

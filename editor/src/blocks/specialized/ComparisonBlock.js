@@ -1,5 +1,6 @@
 import { Block } from '../base/Block.js';
 import { CodeBlock } from '../content/CodeBlock.js';
+import { openIconPicker } from '../../ui/components/IconPickerMenu.js';
 
 /**
  * @typedef {'text'|'code'} ComparisonContentMode
@@ -52,32 +53,6 @@ import { CodeBlock } from '../content/CodeBlock.js';
 
 const VALID_STATUSES = new Set(['neutral', 'correct', 'incorrect']);
 const VALID_MODES = new Set(['text', 'code']);
-const ICON_LIBRARY = [
-  { label: 'Настройки', value: 'fa-light fa-gear' },
-  { label: 'Просмотр', value: 'fa-light fa-eye' },
-  { label: 'Режим кода', value: 'fa-light fa-code' },
-  { label: 'Уменьшить масштаб', value: 'fa-light fa-magnifying-glass-minus' },
-  { label: 'Сброс масштаба', value: 'fa-light fa-arrows-rotate' },
-  { label: 'Увеличить масштаб', value: 'fa-light fa-magnifying-glass-plus' },
-  { label: 'Полноэкранный режим', value: 'fa-light fa-expand' },
-  { label: 'Копирование', value: 'fa-light fa-copy' },
-  { label: 'Изображение', value: 'fa-light fa-image' },
-  { label: 'Закрыть', value: 'fa-light fa-xmark' },
-  { label: 'Перемещение', value: 'fa-light fa-grip-lines' },
-  { label: 'Рост показателей', value: 'fa-light fa-arrow-trend-up' },
-  { label: 'Предупреждение', value: 'fa-light fa-triangle-exclamation' },
-  { label: 'Автоматизация', value: 'fa-light fa-gears' },
-  { label: 'Команда', value: 'fa-light fa-people-group' },
-  { label: 'Документация', value: 'fa-light fa-file-lines' },
-  { label: 'Интерфейс', value: 'fa-light fa-display' },
-  { label: 'Безопасность', value: 'fa-light fa-shield-check' },
-  { label: 'Производительность', value: 'fa-light fa-gauge-high' },
-  { label: 'Добавление', value: 'fa-light fa-plus' },
-  { label: 'Добавить запись', value: 'fa-light fa-circle-plus' },
-  { label: 'Удалить запись', value: 'fa-light fa-trash-can' },
-  { label: 'Подтверждено', value: 'fa-light fa-circle-check' },
-  { label: 'Отклонено', value: 'fa-light fa-circle-xmark' }
-];
 
 /**
  * Блок для визуального сравнения состояний (до/после).
@@ -94,14 +69,9 @@ export class ComparisonBlock extends Block {
     this.title = typeof source.title === 'string' ? source.title : '';
     this.layout = source.layout === 'vertical' ? 'vertical' : 'horizontal';
 
-    /** @type {Map<string, {iconEl: HTMLElement|null, menuEl: HTMLElement|null}>} */
-    this._sideControls = new Map();
-
     /** @type {NormalizedComparisonSection[]} */
     this.sections = this._normalizeSections(source);
 
-    /** @type {AbortController|null} */
-    this._iconMenuAbortController = null;
   }
 
   /**
@@ -381,8 +351,6 @@ export class ComparisonBlock extends Block {
    * @returns {HTMLElement}
    */
   _renderColumn(side, role) {
-    const controlsState = { iconEl: null, menuEl: null };
-
     const column = document.createElement('div');
     column.className = 'comparison-column';
     column.dataset.role = role;
@@ -392,7 +360,7 @@ export class ComparisonBlock extends Block {
       column.classList.add(side.status);
     }
 
-    const header = this._renderHeader(side, controlsState);
+    const header = this._renderHeader(side);
 
     const body = document.createElement('div');
     body.className = 'comparison-body';
@@ -403,7 +371,7 @@ export class ComparisonBlock extends Block {
 
     if (side.mode === 'code') {
       body.classList.add('has-code');
-      body.appendChild(this._renderCodeBody(side));
+      body.appendChild(this._renderCodeBody(side, role));
     } else {
       body.appendChild(this._renderTextContent(side.content));
     }
@@ -422,17 +390,15 @@ export class ComparisonBlock extends Block {
     column.appendChild(header);
     column.appendChild(body);
 
-    this._sideControls.set(side.id, controlsState);
     return column;
   }
 
   /**
    * @private
    * @param {NormalizedComparisonSide} side
-   * @param {{iconEl: HTMLElement|null, menuEl: HTMLElement|null}} controlsState
    * @returns {HTMLElement}
    */
-  _renderHeader(side, controlsState) {
+  _renderHeader(side) {
     const header = document.createElement('div');
     header.className = 'comparison-header';
     header.dataset.sideId = side.id;
@@ -452,7 +418,6 @@ export class ComparisonBlock extends Block {
       const iconEl = document.createElement('i');
       iconEl.className = side.icon;
       iconSlot.appendChild(iconEl);
-      controlsState.iconEl = iconEl;
     }
 
     const headerTitle = document.createElement('span');
@@ -465,7 +430,7 @@ export class ComparisonBlock extends Block {
     const openMenu = (event) => {
       event.preventDefault();
       event.stopPropagation();
-      this._openIconMenu(side, header, iconSlot, controlsState, event);
+      this._openIconPicker(side, header, iconSlot, event);
     };
 
     header.addEventListener('contextmenu', (event) => {
@@ -494,220 +459,21 @@ export class ComparisonBlock extends Block {
    * @param {NormalizedComparisonSide} side
    * @param {HTMLElement} anchor
    * @param {HTMLElement} iconSlot
-   * @param {{iconEl: HTMLElement|null, menuEl: HTMLElement|null}} controlsState
    * @param {MouseEvent|KeyboardEvent} triggerEvent
    */
-  _openIconMenu(side, anchor, iconSlot, controlsState, triggerEvent) {
-    if (controlsState.menuEl) {
-      this._closeIconMenu(controlsState);
-    }
-    this._closeAllIconMenus(controlsState);
-
-    const form = document.createElement('form');
-    form.className = 'diagram-link-editor comparison-icon-editor is-visible';
-    form.style.position = 'fixed';
-    form.setAttribute('role', 'dialog');
-    form.setAttribute('aria-label', `Иконка для "${side.title}"`);
-
-    const title = document.createElement('div');
-    title.className = 'diagram-link-editor__title';
-    title.textContent = 'Иконка колонки';
-    form.appendChild(title);
-
-    const hint = document.createElement('div');
-    hint.className = 'comparison-icon-editor__hint';
-    hint.textContent = 'Выберите иконку из списка или введите классы Font Awesome.';
-    form.appendChild(hint);
-
-    const list = document.createElement('div');
-    list.className = 'comparison-icon-editor__list';
-    ICON_LIBRARY.forEach((iconDef) => {
-      const option = document.createElement('button');
-      option.type = 'button';
-      option.className = 'comparison-icon-editor__option';
-      option.innerHTML = `<i class="${iconDef.value}"></i><span>${iconDef.label}</span>`;
-      if (iconDef.value === side.icon) {
-        option.classList.add('is-active');
-      }
-      option.addEventListener('click', (event) => {
-        event.preventDefault();
-        this._applySideIcon(side, iconDef.value, iconSlot, controlsState);
-      });
-      list.appendChild(option);
+  _openIconPicker(side, anchor, iconSlot, triggerEvent) {
+    openIconPicker({
+      anchor,
+      triggerEvent,
+      currentIcon: side.icon,
+      onSelect: (icon) => {
+        this._applySideIcon(side, icon.value, iconSlot);
+      },
+      onRemove: () => {
+        this._clearSideIcon(side, iconSlot);
+      },
+      title: `Иконка для "${side.title}"`
     });
-    form.appendChild(list);
-
-    const inputId = `${side.id}-icon-classes`;
-    const customLabel = document.createElement('label');
-    customLabel.className = 'diagram-link-editor__label';
-    customLabel.setAttribute('for', inputId);
-    customLabel.textContent = 'Пользовательские классы';
-    form.appendChild(customLabel);
-
-    const customInput = document.createElement('input');
-    customInput.id = inputId;
-    customInput.className = 'diagram-link-editor__input comparison-icon-editor__input';
-    customInput.placeholder = 'fa-light fa-...';
-    customInput.value = side.icon ?? '';
-    form.appendChild(customInput);
-
-    const actions = document.createElement('div');
-    actions.className = 'diagram-link-editor__actions comparison-icon-editor__actions';
-
-    const saveBtn = document.createElement('button');
-    saveBtn.type = 'submit';
-    saveBtn.className = 'diagram-link-editor__btn primary';
-    saveBtn.textContent = 'Сохранить';
-    actions.appendChild(saveBtn);
-
-    const removeBtn = document.createElement('button');
-    removeBtn.type = 'button';
-    removeBtn.className = 'diagram-link-editor__btn danger';
-    removeBtn.textContent = 'Удалить';
-    removeBtn.addEventListener('click', (event) => {
-      event.preventDefault();
-      this._clearSideIcon(side, iconSlot, controlsState);
-    });
-    actions.appendChild(removeBtn);
-
-    const cancelBtn = document.createElement('button');
-    cancelBtn.type = 'button';
-    cancelBtn.className = 'diagram-link-editor__btn';
-    cancelBtn.textContent = 'Отмена';
-    cancelBtn.addEventListener('click', (event) => {
-      event.preventDefault();
-      this._closeIconMenu(controlsState);
-    });
-    actions.appendChild(cancelBtn);
-
-    form.appendChild(actions);
-
-    form.addEventListener('submit', (event) => {
-      event.preventDefault();
-      const value = customInput.value.trim();
-      this._applySideIcon(side, value || null, iconSlot, controlsState);
-    });
-
-    document.body.appendChild(form);
-    controlsState.menuEl = form;
-
-    // Позиционирование относительно указателя мыши, если доступно
-    if (triggerEvent instanceof MouseEvent) {
-      const margin = 12;
-      const { clientX, clientY } = triggerEvent;
-      const rect = form.getBoundingClientRect();
-      let left = clientX;
-      let top = clientY;
-
-      if (left + rect.width > window.innerWidth - margin) {
-        left = window.innerWidth - margin - rect.width;
-      }
-      if (left < margin) {
-        left = margin;
-      }
-      if (top + rect.height > window.innerHeight - margin) {
-        top = window.innerHeight - margin - rect.height;
-      }
-      if (top < margin) {
-        top = margin;
-      }
-
-      form.style.left = `${left}px`;
-      form.style.top = `${top}px`;
-    } else {
-      this._positionFloatingPanel(form, anchor);
-    }
-
-    requestAnimationFrame(() => form.classList.add('is-visible'));
-
-    this._bindIconMenuDismiss(controlsState);
-  }
-
-  /**
-   * @private
-   * @param {{menuEl: HTMLElement|null}} controlsState
-   */
-  _closeIconMenu(controlsState) {
-    if (!controlsState?.menuEl) {
-      return;
-    }
-    controlsState.menuEl.classList.remove('is-visible');
-    controlsState.menuEl.remove();
-    controlsState.menuEl = null;
-    this._disposeIconMenuListeners();
-  }
-
-  /**
-   * @private
-   * @param {{menuEl: HTMLElement|null}} [excludeState]
-   */
-  _closeAllIconMenus(excludeState) {
-    this._sideControls.forEach((state) => {
-      if (!state || state === excludeState) {
-        return;
-      }
-      this._closeIconMenu(state);
-    });
-  }
-
-  /**
-   * @private
-   * @param {{menuEl: HTMLElement|null}} controlsState
-   */
-  _bindIconMenuDismiss(controlsState) {
-    this._disposeIconMenuListeners();
-    if (!controlsState?.menuEl) {
-      return;
-    }
-
-    const { menuEl } = controlsState;
-    this._iconMenuAbortController = new AbortController();
-    const { signal } = this._iconMenuAbortController;
-
-    // Позволяем завершить текущий обработчик перед навешиванием слушателей
-    setTimeout(() => {
-      document.addEventListener(
-        'click',
-        (event) => {
-          if (!menuEl.contains(event.target)) {
-            this._closeIconMenu(controlsState);
-          }
-        },
-        { signal, capture: true }
-      );
-
-      document.addEventListener(
-        'keydown',
-        (event) => {
-          if (event.key === 'Escape') {
-            this._closeIconMenu(controlsState);
-          }
-        },
-        { signal, capture: true }
-      );
-
-      window.addEventListener(
-        'resize',
-        () => this._closeIconMenu(controlsState),
-        { signal }
-      );
-
-      window.addEventListener(
-        'scroll',
-        () => this._closeIconMenu(controlsState),
-        { signal, capture: true }
-      );
-    }, 0);
-  }
-
-  /**
-   * @private
-   */
-  _disposeIconMenuListeners() {
-    if (this._iconMenuAbortController) {
-      this._iconMenuAbortController.abort();
-      this._iconMenuAbortController = null;
-    }
   }
 
   /**
@@ -715,9 +481,8 @@ export class ComparisonBlock extends Block {
    * @param {NormalizedComparisonSide} side
    * @param {string|null} icon
    * @param {HTMLElement} iconSlot
-   * @param {{iconEl: HTMLElement|null, menuEl: HTMLElement|null}} controlsState
    */
-  _applySideIcon(side, icon, iconSlot, controlsState) {
+  _applySideIcon(side, icon, iconSlot) {
     const normalized = this._normalizeIcon(icon);
     side.icon = normalized;
 
@@ -727,25 +492,17 @@ export class ComparisonBlock extends Block {
       const iconEl = document.createElement('i');
       iconEl.className = normalized;
       iconSlot.appendChild(iconEl);
-      controlsState.iconEl = iconEl;
-    } else {
-      controlsState.iconEl = null;
     }
-
-    this._closeIconMenu(controlsState);
   }
 
   /**
    * @private
    * @param {NormalizedComparisonSide} side
    * @param {HTMLElement} iconSlot
-   * @param {{iconEl: HTMLElement|null, menuEl: HTMLElement|null}} controlsState
    */
-  _clearSideIcon(side, iconSlot, controlsState) {
+  _clearSideIcon(side, iconSlot) {
     side.icon = null;
     iconSlot.innerHTML = '';
-    controlsState.iconEl = null;
-    this._closeIconMenu(controlsState);
   }
 
   /**
@@ -753,9 +510,10 @@ export class ComparisonBlock extends Block {
    * @param {NormalizedComparisonSide} side
    * @returns {HTMLElement}
    */
-  _renderCodeBody(side) {
+  _renderCodeBody(side, role) {
     const wrapper = document.createElement('div');
     wrapper.className = 'comparison-code-wrapper';
+    wrapper.classList.add(role === 'after' ? 'comparison-code-wrapper-after' : 'comparison-code-wrapper-before');
 
     const codeString = side.content.join('\n');
 
@@ -782,7 +540,12 @@ export class ComparisonBlock extends Block {
     });
 
     const rendered = codeBlock.render();
-    rendered.classList.add('comparison-inline-code-block');
+    rendered.dataset.role = role;
+    if (role === 'after') {
+      rendered.classList.add('comparison-inline-code-block', 'comparison-inline-code-block-after');
+    } else {
+      rendered.classList.add('comparison-inline-code-block-before');
+    }
     wrapper.appendChild(rendered);
     return wrapper;
   }
