@@ -307,6 +307,110 @@ rectangle EditorCore {
 [EditorCore] --> [ExportManager]
 @enduml`
                 }
+            },
+            {
+                id: 'block-10',
+                type: 'comparison',
+                position: 9,
+                parentId: null,
+                protected: false,
+                data: {
+                    title: 'API до/после внедрения версионирования',
+                    sections: [
+                        {
+                            id: 'comparison-section-1',
+                            title: 'Структура ответа',
+                            description: 'Бэкенд расширили полями версии документа и статуса автосохранения.',
+                            before: {
+                                title: 'Старая версия',
+                                status: 'incorrect',
+                                mode: 'code',
+                                content: [
+                                    '{',
+                                    '  "id": "doc-42",',
+                                    '  "title": "Документ"',
+                                    '}'
+                                ],
+                                notes: [
+                                    'Нет версии документа',
+                                    'Нет статуса последнего сохранения'
+                                ]
+                            },
+                            after: {
+                                title: 'Новая версия',
+                                status: 'correct',
+                                mode: 'code',
+                                content: [
+                                    '{',
+                                    '  "id": "doc-42",',
+                                    '  "title": "Документ",',
+                                    '+  "version": 7,',
+                                    '+  "autosave": {',
+                                    '+    "status": "saved",',
+                                    '+    "savedAt": "2025-11-08T15:42:00Z"',
+                                    '+  }',
+                                    '}'
+                                ],
+                                notes: [
+                                    'Добавлена версия документа',
+                                    'Появился статус автосохранения'
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                id: 'block-11',
+                type: 'comparison',
+                position: 10,
+                parentId: null,
+                protected: false,
+                data: {
+                    title: 'Процесс подготовки релиза',
+                    sections: [
+                        {
+                            id: 'comparison-section-2',
+                            title: 'Коммуникация команды',
+                            before: {
+                                title: 'До стандартизации',
+                                status: 'incorrect',
+                                content: [
+                                    'Каждый разработчик ведет собственные заметки.',
+                                    'Список блокеров хранится в личных чатах.',
+                                    'Неясно, кто отвечает за финальную проверку.'
+                                ]
+                            },
+                            after: {
+                                title: 'После стандартизации',
+                                status: 'correct',
+                                content: [
+                                    'Создан общий шаблон документа релиза в редакторе.',
+                                    'Все блокеры фиксируются в едином ComparisonBlock.',
+                                    'Назначен ответственный за финальную проверку и деплой.'
+                                ],
+                                notes: [
+                                    'Документ доступен всем участникам команды.',
+                                    'История изменений сохраняется автоматически.'
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+            {
+                id: 'block-12',
+                type: 'definition',
+                position: 11,
+                parentId: null,
+                protected: false,
+                data: {
+                    term: 'Inline Formatter',
+                    description: [
+                        'Сервис применяет форматирование прямо в активном текстовом блоке, сохраняя единый поток данных редактора.',
+                        'Поддерживает сочетания клавиш и markdown-сокращения; расширенные блоки пользователь добавляет самостоятельно под определением.'
+                    ]
+                }
             }
         ]
     });

@@ -46,7 +46,7 @@ export class CodeBlockExportStrategy extends BaseBlockExportStrategy {
         <div class="code-block-header">
           <div class="code-header-actions">
             <button class="code-copy-btn" type="button" data-target="${this.escape(codeElementId)}" aria-label="Копировать код" title="Копировать код">
-              <i class="fa-solid fa-copy"></i>
+              <i class="fa-light fa-copy"></i>
             </button>
             <span class="code-language-badge">${this.escape(languageLabel)}</span>
           </div>

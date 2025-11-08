@@ -31,6 +31,8 @@ suite.test('registers all content block types', () => {
   Assert.isDefined(registry.get('steps'));
   Assert.isDefined(registry.get('diagram'));
   Assert.isDefined(registry.get('plantuml'));
+  Assert.isDefined(registry.get('comparison'));
+  Assert.isDefined(registry.get('definition'));
 });
 
 suite.test('registers all structure block types', () => {

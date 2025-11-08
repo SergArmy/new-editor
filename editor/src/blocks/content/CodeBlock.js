@@ -175,7 +175,7 @@ export class CodeBlock extends Block {
     // Кнопка копирования
     const copyBtn = document.createElement('button');
     copyBtn.className = 'code-copy-btn';
-    copyBtn.innerHTML = '<i class="fa-solid fa-copy"></i>';
+    copyBtn.innerHTML = '<i class="fa-light fa-copy"></i>';
     copyBtn.setAttribute('aria-label', 'Копировать код');
     copyBtn.setAttribute('title', 'Копировать код');
     copyBtn.addEventListener('click', (e) => {
@@ -399,7 +399,7 @@ export class CodeBlock extends Block {
 
     // Иконка для визуального указания на возможность изменения размера
     const icon = document.createElement('i');
-    icon.className = 'fa-solid fa-grip-lines';
+    icon.className = 'fa-light fa-grip-lines';
     handle.appendChild(icon);
 
     // Обработчики событий для изменения размера

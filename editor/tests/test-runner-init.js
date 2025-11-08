@@ -38,6 +38,8 @@ import checklistBlockSuite from './unit/blocks/specialized/checklist-block.test.
 import stepsBlockSuite from './unit/blocks/specialized/steps-block.test.js';
 import diagramBlockSuite from './unit/blocks/specialized/diagram-block.test.js';
 import plantumlBlockSuite from './unit/blocks/specialized/plantuml-block.test.js';
+import comparisonBlockSuite from './unit/blocks/specialized/comparison-block.test.js';
+import definitionBlockSuite from './unit/blocks/specialized/definition-block.test.js';
 import editorErrorSuite from './unit/core/errors/editor-error.test.js';
 import validationErrorSuite from './unit/core/errors/validation-error.test.js';
 import stateErrorSuite from './unit/core/errors/state-error.test.js';
@@ -115,6 +117,8 @@ runner.registerSuite(checklistBlockSuite);
 runner.registerSuite(stepsBlockSuite);
 runner.registerSuite(diagramBlockSuite);
 runner.registerSuite(plantumlBlockSuite);
+runner.registerSuite(comparisonBlockSuite);
+runner.registerSuite(definitionBlockSuite);
 runner.registerSuite(editorErrorSuite);
 runner.registerSuite(validationErrorSuite);
 runner.registerSuite(stateErrorSuite);

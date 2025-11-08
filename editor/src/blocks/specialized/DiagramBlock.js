@@ -11,6 +11,11 @@ const FORMAT_OPTIONS = [
   { value: 'png', label: 'PNG' }
 ];
 
+const LINK_TEXT_COLOR = '#2563eb';
+const LINK_BLOCK_FILL = 'rgba(59, 130, 246, 0.18)';
+const LINK_BLOCK_STROKE = 'rgba(37, 99, 235, 0.55)';
+const SELECTION_SCALE = 1.06;
+
 /**
  * @typedef {Object} DiagramLink
  * @property {string} id
@@ -682,8 +687,7 @@ export class DiagramBlock extends Block {
     }
 
     svg.querySelectorAll('[data-diagram-link-id]').forEach((node) => {
-      node.classList.remove('diagram-link-target');
-      node.removeAttribute('data-diagram-link-id');
+      this._resetLinkedElementState(node);
     });
 
     this._linkMap.clear();
@@ -696,7 +700,7 @@ export class DiagramBlock extends Block {
         const target = svg.querySelector(link.selector);
         if (target instanceof Element) {
           target.setAttribute('data-diagram-link-id', link.id);
-          target.classList.add('diagram-link-target');
+          this._decorateLinkedElement(target);
           this._linkMap.set(target, link);
         }
       } catch (error) {
@@ -707,6 +711,206 @@ export class DiagramBlock extends Block {
     const hasLinks = this._linkMap.size > 0;
     this.previewContainer?.classList.toggle('has-diagram-links', hasLinks);
     svg.classList.toggle('has-diagram-links', hasLinks);
+  }
+
+  /**
+   * Настраивает внешний вид элемента с установленной ссылкой
+   * @param {Element} element
+   * @private
+   */
+  _decorateLinkedElement(element) {
+    if (!(element instanceof Element)) {
+      return;
+    }
+
+    element.classList.add('diagram-link-target');
+
+    const isText = this._isTextLikeElement(element);
+    element.dataset.diagramLinkType = isText ? 'text' : 'block';
+    element.classList.toggle('diagram-link-text', isText);
+    element.classList.toggle('diagram-link-block', !isText);
+
+    if (element.dataset.diagramLinkOriginalTransform === undefined) {
+      element.dataset.diagramLinkOriginalTransform = element.style.transform || '';
+    }
+    if (element.dataset.diagramLinkOriginalTransformOrigin === undefined) {
+      element.dataset.diagramLinkOriginalTransformOrigin = element.style.transformOrigin || '';
+    }
+    if (element.dataset.diagramLinkOriginalTransformBox === undefined) {
+      element.dataset.diagramLinkOriginalTransformBox = element.style.transformBox || '';
+    }
+
+    const bbox = typeof element.getBBox === 'function' ? element.getBBox() : null;
+    if (bbox && Number.isFinite(bbox.width) && Number.isFinite(bbox.height)) {
+      const originX = bbox.x + bbox.width / 2;
+      const originY = bbox.y + bbox.height / 2;
+      element.dataset.diagramLinkOriginX = String(originX);
+      element.dataset.diagramLinkOriginY = String(originY);
+      element.style.transformOrigin = `${originX}px ${originY}px`;
+      element.style.transformBox = 'fill-box';
+    } else {
+      element.style.transformOrigin = 'center';
+      element.style.transformBox = 'fill-box';
+      element.dataset.diagramLinkOriginX = '';
+      element.dataset.diagramLinkOriginY = '';
+    }
+
+    if (element.dataset.diagramLinkOriginalFillStyle === undefined) {
+      element.dataset.diagramLinkOriginalFillStyle = element.style.fill || '';
+    }
+
+    if (!isText && this._isShapeElement(element)) {
+      if (element.dataset.diagramLinkOriginalStrokeStyle === undefined) {
+        element.dataset.diagramLinkOriginalStrokeStyle = element.style.stroke || '';
+      }
+      if (element.dataset.diagramLinkAddedStroke === undefined) {
+        element.dataset.diagramLinkAddedStroke = '';
+      }
+    }
+
+    if (isText) {
+      if (element.dataset.diagramLinkOriginalTextDecoration === undefined) {
+        element.dataset.diagramLinkOriginalTextDecoration = element.style.textDecoration || '';
+      }
+      if (element.dataset.diagramLinkOriginalTextDecorationColor === undefined) {
+        element.dataset.diagramLinkOriginalTextDecorationColor = element.style.textDecorationColor || '';
+      }
+
+      element.style.fill = 'var(--diagram-link-text-color, ' + LINK_TEXT_COLOR + ')';
+      element.style.textDecoration = 'underline';
+      element.style.textDecorationColor = 'var(--diagram-link-text-color, ' + LINK_TEXT_COLOR + ')';
+    } else if (this._isShapeElement(element)) {
+      element.style.fill = 'var(--diagram-link-block-fill, ' + LINK_BLOCK_FILL + ')';
+      if (!element.style.stroke && !element.hasAttribute('stroke')) {
+        element.dataset.diagramLinkAddedStroke = '1';
+        element.style.stroke = 'var(--diagram-link-block-stroke, ' + LINK_BLOCK_STROKE + ')';
+      }
+    }
+
+    if (element.dataset.diagramLinkHadTabindex === undefined) {
+      element.dataset.diagramLinkHadTabindex = element.hasAttribute('tabindex') ? '1' : '0';
+      if (element.dataset.diagramLinkHadTabindex === '1') {
+        element.dataset.diagramLinkOriginalTabindex = element.getAttribute('tabindex') ?? '';
+      }
+    }
+
+    if (!element.hasAttribute('tabindex')) {
+      element.setAttribute('tabindex', '0');
+    }
+  }
+
+  /**
+   * Сбрасывает визуальные изменения элемента со ссылкой
+   * @param {Element} element
+   * @private
+   */
+  _resetLinkedElementState(element) {
+    if (!(element instanceof Element)) {
+      return;
+    }
+
+    this._restoreSelectionTransform(element);
+
+    const originalTransform = element.dataset.diagramLinkOriginalTransform;
+    if (originalTransform !== undefined) {
+      element.style.transform = originalTransform;
+      delete element.dataset.diagramLinkOriginalTransform;
+    } else {
+      element.style.transform = '';
+    }
+
+    const originalTransformOrigin = element.dataset.diagramLinkOriginalTransformOrigin;
+    if (originalTransformOrigin !== undefined) {
+      element.style.transformOrigin = originalTransformOrigin;
+      delete element.dataset.diagramLinkOriginalTransformOrigin;
+    } else {
+      element.style.transformOrigin = '';
+    }
+
+    const originalTransformBox = element.dataset.diagramLinkOriginalTransformBox;
+    if (originalTransformBox !== undefined) {
+      element.style.transformBox = originalTransformBox;
+      delete element.dataset.diagramLinkOriginalTransformBox;
+    } else {
+      element.style.transformBox = '';
+    }
+
+    delete element.dataset.diagramLinkOriginX;
+    delete element.dataset.diagramLinkOriginY;
+
+    const storedFill = element.dataset.diagramLinkOriginalFillStyle;
+    if (storedFill !== undefined) {
+      element.style.fill = storedFill;
+      delete element.dataset.diagramLinkOriginalFillStyle;
+    } else {
+      element.style.fill = '';
+    }
+
+    if (this._isShapeElement(element)) {
+      const storedStroke = element.dataset.diagramLinkOriginalStrokeStyle;
+      if (storedStroke !== undefined) {
+        element.style.stroke = storedStroke;
+        delete element.dataset.diagramLinkOriginalStrokeStyle;
+      } else if (element.dataset.diagramLinkAddedStroke === '1') {
+        element.style.stroke = '';
+      }
+      delete element.dataset.diagramLinkAddedStroke;
+    }
+
+    const storedDecoration = element.dataset.diagramLinkOriginalTextDecoration;
+    if (storedDecoration !== undefined) {
+      element.style.textDecoration = storedDecoration;
+      delete element.dataset.diagramLinkOriginalTextDecoration;
+    } else if (element.dataset.diagramLinkType === 'text') {
+      element.style.textDecoration = '';
+    }
+
+    const storedDecorationColor = element.dataset.diagramLinkOriginalTextDecorationColor;
+    if (storedDecorationColor !== undefined) {
+      element.style.textDecorationColor = storedDecorationColor;
+      delete element.dataset.diagramLinkOriginalTextDecorationColor;
+    } else if (element.dataset.diagramLinkType === 'text') {
+      element.style.textDecorationColor = '';
+    }
+
+    if (element.dataset.diagramLinkHadTabindex !== undefined) {
+      if (element.dataset.diagramLinkHadTabindex === '1') {
+        const originalTabIndex = element.dataset.diagramLinkOriginalTabindex ?? '';
+        element.setAttribute('tabindex', originalTabIndex);
+      } else {
+        element.removeAttribute('tabindex');
+      }
+      delete element.dataset.diagramLinkHadTabindex;
+      delete element.dataset.diagramLinkOriginalTabindex;
+    } else {
+      element.removeAttribute('tabindex');
+    }
+
+    element.classList.remove('diagram-link-target', 'diagram-link-text', 'diagram-link-block', 'diagram-link-selected');
+    element.removeAttribute('data-diagram-link-id');
+    delete element.dataset.diagramLinkType;
+  }
+
+  /**
+   * Проверяет, является ли элемент текстовым
+   * @param {Element} element
+   * @returns {boolean}
+   * @private
+   */
+  _isTextLikeElement(element) {
+    const textTags = ['text', 'tspan', 'textpath'];
+    return textTags.includes(element.tagName.toLowerCase());
+  }
+
+  /**
+   * Проверяет, является ли элемент базовой SVG-фигурой
+   * @param {Element} element
+   * @returns {boolean}
+   * @private
+   */
+  _isShapeElement(element) {
+    const shapeTags = ['rect', 'circle', 'ellipse', 'path', 'polygon', 'polyline', 'line'];
+    return shapeTags.includes(element.tagName.toLowerCase());
   }
 
   /**
@@ -967,6 +1171,7 @@ export class DiagramBlock extends Block {
    */
   _highlightLinkElement(element) {
     this._clearLinkSelection();
+    this._applySelectionTransform(element);
     element.classList.add('diagram-link-selected');
     this._currentLinkElement = element;
   }
@@ -979,11 +1184,59 @@ export class DiagramBlock extends Block {
     const svg = this._getSvgElement();
     if (svg) {
       svg.querySelectorAll('.diagram-link-selected').forEach((node) => {
+        this._restoreSelectionTransform(node);
         node.classList.remove('diagram-link-selected');
       });
     }
     this._currentLinkElement = null;
     this._currentLinkDraft = null;
+  }
+
+  /**
+   * Применяет масштабирование к текущему выделенному элементу
+   * @param {Element} element
+   * @private
+   */
+  _applySelectionTransform(element) {
+    if (!(element instanceof Element)) {
+      return;
+    }
+
+    const baseTransform = element.dataset.diagramLinkOriginalTransform ?? '';
+    const originX = element.dataset.diagramLinkOriginX;
+    const originY = element.dataset.diagramLinkOriginY;
+
+    let selectionTransform = `scale(${SELECTION_SCALE})`;
+    if (originX && originY && originX !== '' && originY !== '') {
+      const ox = Number(originX);
+      const oy = Number(originY);
+      if (Number.isFinite(ox) && Number.isFinite(oy)) {
+        selectionTransform = `translate(${ox}px, ${oy}px) scale(${SELECTION_SCALE}) translate(${-ox}px, ${-oy}px)`;
+      }
+    }
+
+    element.dataset.diagramLinkSelectionTransform = selectionTransform;
+    const base = baseTransform.trim();
+    element.style.transform = base ? `${base} ${selectionTransform}` : selectionTransform;
+  }
+
+  /**
+   * Восстанавливает исходный трансформ элемента после снятия выделения
+   * @param {Element} element
+   * @private
+   */
+  _restoreSelectionTransform(element) {
+    if (!(element instanceof Element)) {
+      return;
+    }
+
+    const baseTransform = element.dataset.diagramLinkOriginalTransform;
+    if (baseTransform !== undefined) {
+      element.style.transform = baseTransform;
+    } else {
+      element.style.transform = '';
+    }
+    delete element.dataset.diagramLinkSelectionTransform;
   }
 
   /**
@@ -1006,8 +1259,10 @@ export class DiagramBlock extends Block {
     this._linkHrefInput.value = link?.href ?? '';
     this._linkNewTabInput.checked = link?.openInNewTab !== false;
 
-    this._positionLinkEditor(element);
     this._linkEditor.classList.add('is-visible');
+    this._linkEditor.style.visibility = 'hidden';
+    this._positionLinkEditor(element);
+    this._linkEditor.style.visibility = '';
     this._linkHrefInput.focus();
     this._linkHrefInput.select();
   }
@@ -1027,6 +1282,9 @@ export class DiagramBlock extends Block {
 
     const editor = document.createElement('form');
     editor.className = 'diagram-link-editor';
+    editor.style.position = 'fixed';
+    editor.style.top = '0';
+    editor.style.left = '0';
     editor.addEventListener('submit', (event) => {
       event.preventDefault();
       this._saveCurrentLink();
@@ -1099,7 +1357,7 @@ export class DiagramBlock extends Block {
     editor.appendChild(extraControls);
     editor.appendChild(actions);
 
-    this.contentContainer.appendChild(editor);
+    document.body.appendChild(editor);
 
     this._linkEditor = editor;
     this._linkHrefInput = hrefInput;
@@ -1112,18 +1370,44 @@ export class DiagramBlock extends Block {
    * @private
    */
   _positionLinkEditor(element) {
-    if (!this._linkEditor || !this.contentContainer) {
+    if (!this._linkEditor) {
       return;
     }
 
-    const containerRect = this.contentContainer.getBoundingClientRect();
+    const editor = this._linkEditor;
     const elementRect = element.getBoundingClientRect();
 
-    const top = Math.max(0, elementRect.top - containerRect.top - 12);
-    const left = Math.max(0, elementRect.left - containerRect.left);
+    const viewportWidth = Math.max(document.documentElement?.clientWidth ?? 0, window.innerWidth ?? 0);
+    const viewportHeight = Math.max(document.documentElement?.clientHeight ?? 0, window.innerHeight ?? 0);
 
-    this._linkEditor.style.top = `${top}px`;
-    this._linkEditor.style.left = `${left}px`;
+    const editorWidth = editor.offsetWidth;
+    const editorHeight = editor.offsetHeight;
+
+    let left = elementRect.right + 16;
+    let top = elementRect.top - 12;
+
+    if (Number.isFinite(editorWidth) && editorWidth > 0) {
+      if (left + editorWidth > viewportWidth - 16) {
+        left = elementRect.left - editorWidth - 16;
+      }
+      if (left < 16) {
+        left = 16;
+      }
+    }
+
+    if (Number.isFinite(editorHeight) && editorHeight > 0) {
+      if (top + editorHeight > viewportHeight - 16) {
+        top = viewportHeight - editorHeight - 16;
+      }
+      if (top < 16) {
+        top = 16;
+      }
+    }
+
+    editor.style.left = `${Math.round(left)}px`;
+    editor.style.top = `${Math.round(top)}px`;
+    editor.style.right = 'auto';
+    editor.style.bottom = 'auto';
   }
 
   /**
@@ -1761,6 +2045,7 @@ export class DiagramBlock extends Block {
       this.metaPopover.classList.add('is-open');
       this.metaPopover.setAttribute('aria-hidden', 'false');
       this.metaTrigger?.classList.add('is-active');
+      requestAnimationFrame(() => this._positionMetaPopover());
       if (!this._boundMetaOutsideClick) {
         this._boundMetaOutsideClick = (event) => {
           if (!this.metaPopover) {
@@ -1785,6 +2070,56 @@ export class DiagramBlock extends Block {
         document.removeEventListener('click', this._boundMetaOutsideClick);
       }
     }
+  }
+
+  /**
+   * Вычисляет позицию поповера метаданных
+   * @private
+   */
+  _positionMetaPopover() {
+    if (!this.metaPopover) {
+      return;
+    }
+
+    const anchor = this.metaTrigger || this.metaElement;
+    if (!anchor) {
+      return;
+    }
+
+    const panel = this.metaPopover;
+    const margin = 12;
+
+    panel.style.visibility = 'hidden';
+    panel.style.top = '0px';
+    panel.style.left = '0px';
+
+    const panelRect = panel.getBoundingClientRect();
+    const anchorRect = anchor.getBoundingClientRect();
+
+    let top = anchorRect.bottom + margin;
+    let left = anchorRect.left + (anchorRect.width / 2) - (panelRect.width / 2);
+
+    if (top + panelRect.height > window.innerHeight - margin) {
+      top = anchorRect.top - panelRect.height - margin;
+    }
+
+    if (top < margin) {
+      top = margin;
+    } else if (top + panelRect.height > window.innerHeight - margin) {
+      top = window.innerHeight - margin - panelRect.height;
+    }
+
+    if (left < margin) {
+      left = margin;
+    } else if (left + panelRect.width > window.innerWidth - margin) {
+      left = window.innerWidth - margin - panelRect.width;
+    }
+
+    panel.style.top = `${top}px`;
+    panel.style.left = `${left}px`;
+    panel.style.right = 'auto';
+    panel.style.bottom = 'auto';
+    panel.style.visibility = 'visible';
   }
 
   /**

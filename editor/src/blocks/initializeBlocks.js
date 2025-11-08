@@ -12,6 +12,8 @@ import { ChecklistBlock } from './specialized/ChecklistBlock.js';
 import { StepsBlock } from './specialized/StepsBlock.js';
 import { DiagramBlock } from './specialized/DiagramBlock.js';
 import { PlantUMLBlock } from './specialized/PlantUMLBlock.js';
+import { ComparisonBlock } from './specialized/ComparisonBlock.js';
+import { DefinitionBlock } from './specialized/DefinitionBlock.js';
 
 import { SectionBlock } from './structure/SectionBlock.js';
 import { HeaderBlock } from './structure/HeaderBlock.js';
@@ -39,6 +41,8 @@ export function initializeBlocks() {
   registry.register('steps', StepsBlock);
   registry.register('diagram', DiagramBlock);
   registry.register('plantuml', PlantUMLBlock);
+  registry.register('comparison', ComparisonBlock);
+  registry.register('definition', DefinitionBlock);
 
   // Регистрируем структурные блоки
   registry.register('section', SectionBlock);
