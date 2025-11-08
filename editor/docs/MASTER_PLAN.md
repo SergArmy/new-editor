@@ -35,9 +35,18 @@ Legend: [x] — выполнено, [ ] — в работе/запланиров
    - [x] Text/Code/Image/Table/Quote — Completed At: 2025-01-XX
    - [~] Специализированные блоки (Checklist, Steps, Diagram, PlantUML, Comparison, Definition, Roles, Action) — In Progress: 2025-11-07 21:00
      - [x] ChecklistBlock — Completed At: 2025-11-07 21:00
-     - [x] StepsBlock — Completed At: 2025-11-07 21:40
-     - [x] DiagramBlock — Completed At: 2025-11-07 22:05
-     - [x] PlantUMLBlock — Completed At: 2025-11-07 22:35; Fixed async loading: 2025-11-07 22:50
+     - [x] StepsBlock — Completed At: 2025-11-07 21:40; UI refresh: 2025-11-08 (session 2)
+     - [x] DiagramBlock (базовая версия) — Completed At: 2025-11-07 22:05
+     - [x] PlantUMLBlock (базовая версия) — Completed At: 2025-11-07 22:35; Fixed async loading: 2025-11-07 22:50
+     - [x] DiagramBlock и PlantUMLBlock (расширенный функционал) — Completed At: 2025-11-07 23:30
+       - Элементы управления (масштаб, копирование, полноэкранный режим)
+       - Переключение между превью и редактором кода
+       - Toast-уведомления
+       - Наследование PlantUMLBlock от DiagramBlock
+       - Перенос кнопок копирования в заголовок, оверлей масштабирования, ресайзер по высоте
+       - Интеграция Monaco CodeBlock с выбором движка диаграммы
+      - [x] Кликабельные области, подсветка и контекстное меню ссылок — Completed At: 2025-11-08 17:15
+     - [x] Подсветка PlantUML в редакторе диаграмм — Completed At: 2025-11-08 (session 1)
      - [ ] ComparisonBlock
      - [ ] DefinitionBlock
      - [ ] RolesBlock
@@ -119,6 +128,10 @@ Legend: [x] — выполнено, [ ] — в работе/запланиров
 - Каждую завершённую задачу отмечать [x] и добавлять строку `Completed At: YYYY-MM-DD HH:mm` (локальное время разработчика).
 - Обязательно дублировать запись в `docs/PROGRESS.md` с коротким описанием шага, что сделано, и ссылками на изменённые файлы.
 - Использовать единый формат времени `YYYY-MM-DD HH:mm`.
+
+### 8) Known Issues / Bugs
+- [x] Потеря фокуса при клике внутри CodeBlock — Fixed: 2025-11-08 (session 1)
+- [x] StepsBlock отображал только номера без содержимого — Fixed: 2025-11-08 (session 2)
 
 ### 4.1) Правила обработки горячих клавиш
 **КРИТИЧНО**: При реализации горячих клавиш всегда использовать физические коды клавиш (`e.code`) вместо символов (`e.key`) для обеспечения работы независимо от раскладки клавиатуры/языка.

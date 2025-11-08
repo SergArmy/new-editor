@@ -614,8 +614,8 @@ body {
     line-height: 1.5;
     box-shadow: var(--shadow);
     font-family: 'Consolas', 'Courier New', monospace;
-    overflow: hidden;
-    /* hidden для правильного отображения закругления */
+    overflow: visible;
+    /* visible позволяет выпадающим спискам выходить за пределы блока */
     position: relative;
     padding: 0;
     /* Убираем все padding */
@@ -713,10 +713,13 @@ body {
     /* Такой же как основной блок */
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--border-radius);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
-    min-width: 150px;
-    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    z-index: 2000;
+    min-width: 180px;
+    max-height: 240px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: thin;
 }
 
 .code-language-item {
@@ -1101,529 +1104,10 @@ body {
 .diagram-block {
     margin: var(--spacing-lg) 0;
     padding: var(--spacing-lg);
-    background-color: #f7fafc;
+    background: var(--page-background, var(--bg-color, #ffffff));
     border-radius: var(--border-radius);
-    border: 1px solid var(--border-color);
-    position: relative;
-}
-
-.diagram-container {
-    overflow: hidden;
-    margin: var(--spacing-md) 0;
-    border-radius: var(--border-radius);
-    background: white;
-    position: relative;
-    min-height: 400px;
-    /* Фиксированная минимальная высота */
-    height: 500px;
-    /* Фиксированная высота для стабильности */
-}
-
-
-/* Контейнер PlantUML Viewer */
-.plantuml-viewer-container {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    width: 100%;
-    overflow: hidden;
-    /* Изменено с visible на hidden */
-    font-family: var(--font-family);
-    background: #f5f5f5;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    min-height: 400px;
-    height: 500px;
-    /* Синхронизируем высоту */
-}
-
-.plantuml-viewer-main {
-    flex: 1;
-    overflow: hidden;
-    position: relative;
-    height: 450px;
-    /* Фиксированная высота основного контейнера */
-}
-
-plantuml-viewer-diagram {
-    height: 100%;
-    width: 100%;
-    border: none;
-    background: white;
-    overflow: auto;
-    /* Добавляем скролл при необходимости */
-    min-height: 400px;
-    position: absolute;
-    top: 0;
-    left: 0;
-}
-
-/* Блок для отображения кода */
-.plantuml-viewer-code {
-    display: none;
-    height: 100%;
-    width: 100%;
-    border: none;
-    overflow: hidden;
-    position: absolute;
-    top: 0;
-    left: 0;
-    min-height: 400px;
-}
-
-/* Используем стандартный блок кода */
-.plantuml-viewer-code .code-block {
-    height: 100%;
-    margin: 0;
-    border-radius: 0;
+    border: 1px солид rgba(226, 232, 240, 0.9);
     box-shadow: none;
-    position: relative;
-    overflow: auto;
-}
-
-
-/* Убираем стандартные отступы для лучшего заполнения пространства */
-.plantuml-viewer-code .code-block pre {
-    height: 100%;
-    margin: 0;
-    padding: var(--spacing-md);
-    background: transparent !important;
-    border-radius: 0;
-}
-
-
-
-/* Обеспечиваем одинаковое оформление для кода */
-.plantuml-viewer-code pre {
-    margin: 0;
-    padding: var(--spacing-md);
-    height: 100%;
-    background: transparent !important;
-    color: #e2e8f0;
-    overflow: auto;
-}
-
-
-.plantuml-viewer-code code {
-    font-family: 'Consolas', 'Courier New', monospace;
-    font-size: var(--font-size-sm);
-    line-height: 1.5;
-    background: transparent !important;
-    color: #e2e8f0;
-    display: block;
-    height: 100%;
-}
-
-/* Показываем код при активном режиме */
-.plantuml-viewer-container.code-mode .plantuml-viewer-diagram {
-    display: none;
-}
-
-.plantuml-viewer-container.code-mode .plantuml-viewer-code {
-    display: block;
-}
-
-.plantuml-viewer-status {
-    padding: var(--spacing-sm) var(--spacing-md);
-    font-size: var(--font-size-xs);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: #f0f0f0;
-    color: #666;
-    border-top: 1px solid var(--border-color);
-    position: relative;
-    z-index: 10;
-}
-
-.plantuml-viewer-status-left {
-    display: flex;
-    align-items: center;
-}
-
-.plantuml-viewer-spinner {
-    width: 16px;
-    height: 16px;
-    margin-right: var(--spacing-sm);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    animation: pv-spin 1s linear infinite;
-}
-
-.plantuml-viewer-spinner circle {
-    stroke: var(--accent-color);
-}
-
-@keyframes pv-spin {
-    0% {
-        transform: rotate(0deg);
-    }
-
-    100% {
-        transform: rotate(360deg);
-    }
-}
-
-/* Элементы управления */
-.puv-controls {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    position: relative;
-    z-index: 1000;
-}
-
-.puv-menu-container {
-    display: flex;
-    gap: var(--spacing-xs);
-    position: relative;
-}
-
-.puv-menu-wrapper {
-    position: relative;
-    display: inline-block;
-}
-
-/* Кнопка переключения режима */
-.puv-toggle-view-btn {
-    background: white;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    padding: var(--spacing-xs) var(--spacing-sm);
-    font-size: var(--font-size-xs);
-    color: var(--text-color);
-    transition: var(--transition);
-    margin-right: var(--spacing-xs);
-}
-
-.puv-toggle-view-btn:hover {
-    background-color: #f0f0f0;
-}
-
-.puv-toggle-view-btn.active {
-    background-color: var(--accent-color);
-    color: white;
-    border-color: var(--accent-color);
-}
-
-/* Выпадающие меню */
-.puv-dropdown-menu {
-    display: none;
-    position: absolute;
-    bottom: 100%;
-    left: 0;
-    background: white;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
-    z-index: 1001;
-    flex-direction: column;
-    padding: var(--spacing-xs);
-    gap: 1px;
-    margin-bottom: 5px;
-    min-width: max-content;
-}
-
-.puv-menu-open {
-    display: flex;
-}
-
-.puv-control-btn {
-    background: white;
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    padding: var(--spacing-xs) var(--spacing-sm);
-    font-size: var(--font-size-xs);
-    color: var(--text-color);
-    transition: var(--transition);
-    position: relative;
-    z-index: 1002;
-}
-
-.puv-control-btn:hover {
-    background-color: #f0f0f0;
-}
-
-.puv-control-btn:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-}
-
-.puv-menu-btn-active {
-    background-color: var(--light-color);
-    border-color: var(--accent-color);
-}
-
-.puv-menu-item {
-    background: none;
-    border: none;
-    padding: var(--spacing-xs) var(--spacing-sm);
-    cursor: pointer;
-    text-align: left;
-    font-size: var(--font-size-xs);
-    white-space: nowrap;
-    border-radius: 2px;
-    transition: var(--transition);
-}
-
-.puv-menu-item:hover {
-    background-color: var(--light-color);
-}
-
-.puv-menu-item:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-}
-
-/* Лоадер */
-.plantuml-viewer-loader {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.9);
-    display: none;
-    /* По умолчанию скрыт */
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 100;
-}
-
-.plantuml-viewer-loader-spinner {
-    width: 40px;
-    height: 40px;
-    border: 4px solid #f3f3f3;
-    border-top: 4px solid var(--accent-color);
-    border-radius: 50%;
-    animation: pv-spin 1s linear infinite;
-    margin-bottom: var(--spacing-md);
-}
-
-.plantuml-viewer-loader-text {
-    font-size: var(--font-size-sm);
-    color: #666;
-}
-
-/* Адаптивность */
-@media (max-width: 768px) {
-    .diagram-container {
-        min-height: 250px;
-    }
-
-    .plantuml-viewer-container {
-        min-height: 350px;
-    }
-
-    .puv-menu-container {
-        flex-direction: column;
-    }
-
-    .puv-dropdown-menu {
-        left: auto;
-        right: 0;
-    }
-
-    plantuml-viewer-code .code-block {
-        font-size: var(--font-size-xs);
-    }
-
-    .plantuml-viewer-code .code-block pre {
-        padding: var(--spacing-sm);
-    }
-}
-
-/* Специфические стили для меню */
-.puv-copy-menu {
-    min-width: 140px;
-}
-
-.puv-position-menu {
-    min-width: 120px;
-}
-
-
-/* ==========================================================================
-   Стили для чекбоксов
-   ========================================================================== */
-
-.checklist-block {
-    margin: var(--spacing-lg) 0;
-}
-
-.checklist-title {
-    font-weight: 600;
-    margin-bottom: var(--spacing-sm);
-    color: var(--text-color);
-}
-
-.checklist-progress {
-    font-size: var(--font-size-sm);
-    color: rgba(45, 55, 72, 0.7);
-    margin-bottom: var(--spacing-sm);
-}
-
-.checklist-items {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.checklist-item {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: var(--spacing-md);
-}
-
-.checklist-item input[type="checkbox"] {
-    margin-right: var(--spacing-md);
-    margin-top: var(--spacing-xs);
-}
-
-.checklist-item-content {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.checklist-item-label {
-    font-weight: 500;
-    color: var(--text-color);
-}
-
-.checklist-item-description {
-    font-size: var(--font-size-sm);
-    color: rgba(45, 55, 72, 0.75);
-}
-
-.checklist-empty {
-    font-style: italic;
-    color: rgba(45, 55, 72, 0.6);
-}
-
-/* ==========================================================================
-   Стили для блока действия
-   ========================================================================== */
-
-.action-block {
-    background-color: #f0fff4;
-    border-left: 4px solid var(--success-color);
-    padding: var(--spacing-lg);
-    margin: var(--spacing-lg) 0;
-    border-radius: 0 var(--border-radius) var(--border-radius) 0;
-}
-
-.action-responsible {
-    display: flex;
-    justify-content: space-between;
-    margin-top: var(--spacing-md);
-    font-size: var(--font-size-sm);
-}
-
-/* ==========================================================================
-   Стили для блока пошаговой инструкции
-   ========================================================================== */
-
-.steps-block {
-    margin: var(--spacing-lg) 0;
-    counter-reset: step-counter;
-}
-
-.steps-title {
-    font-weight: 600;
-    margin-bottom: var(--spacing-sm);
-    color: var(--text-color);
-}
-
-.steps-empty {
-    font-style: italic;
-    color: rgba(45, 55, 72, 0.6);
-}
-
-.steps-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-md);
-}
-
-.step-item {
-    display: flex;
-    margin-bottom: var(--spacing-md);
-    counter-increment: step-counter;
-}
-
-.step-item[data-status="done"] .step-number {
-    background-color: var(--success-color);
-}
-
-.step-item[data-status="active"] .step-number {
-    background-color: var(--accent-color);
-    box-shadow: 0 0 0 4px rgba(49, 130, 206, 0.15);
-}
-
-.step-number {
-    flex-shrink: 0;
-    width: 30px;
-    height: 30px;
-    background-color: var(--accent-color);
-    color: white;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: var(--spacing-md);
-    font-weight: 600;
-}
-
-.step-content {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-}
-
-.step-title {
-    font-weight: 500;
-    color: var(--text-color);
-}
-
-.step-status {
-    display: inline-block;
-    font-size: var(--font-size-xs);
-    color: var(--accent-color);
-    background: rgba(49, 130, 206, 0.12);
-    border-radius: var(--border-radius);
-    padding: 2px 8px;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-}
-
-.step-item[data-status="done"] .step-status {
-    color: var(--success-color);
-    background: rgba(56, 161, 105, 0.12);
-}
-
-.step-description {
-    font-size: var(--font-size-sm);
-    color: rgba(45, 55, 72, 0.75);
-}
-
-/* ==========================================================================
-   Стили для блока диаграммы
-   ========================================================================== */
-
-.diagram-block {
-    margin: var(--spacing-lg) 0;
-    padding: var(--spacing-lg);
-    background: linear-gradient(135deg, rgba(49, 130, 206, 0.05), rgba(56, 189, 248, 0.05));
-    border-radius: var(--border-radius);
-    border: 1px solid rgba(49, 130, 206, 0.15);
     display: flex;
     flex-direction: column;
     gap: var(--spacing-md);
@@ -1631,21 +1115,150 @@ plantuml-viewer-diagram {
 
 .diagram-header {
     display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacing-lg);
+}
+
+.diagram-header-left {
+    flex: 1;
+    min-width: 0;
+}
+
+.diagram-header-right {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    position: relative;
+}
+
+.diagram-meta-group {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    position: relative;
 }
 
 .diagram-meta {
     font-size: var(--font-size-xs);
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: rgba(49, 130, 206, 0.9);
+    color: rgba(49, 130, 206, 0.95);
+    font-weight: 600;
+}
+
+.diagram-meta-trigger {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(59, 130, 246, 0.18);
+    border: 1px solid rgba(59, 130, 246, 0.28);
+    color: rgba(17, 24, 39, 0.85);
+}
+
+.diagram-meta-trigger.is-active,
+.diagram-meta-trigger:hover {
+    background: rgba(59, 130, 246, 0.28);
+    border-color: rgba(59, 130, 246, 0.38);
+}
+
+.diagram-meta--interactive {
+    cursor: pointer;
+    user-select: none;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xxs);
+}
+
+.diagram-meta--interactive::after {
+    content: '';
+    width: 6px;
+    height: 6px;
+    border-left: 1px solid currentColor;
+    border-bottom: 1px solid currentColor;
+    transform: rotate(-45deg);
+    margin-top: -1px;
+}
+
+.diagram-meta-popover {
+    display: none;
+    position: absolute;
+    top: calc(100% + var(--spacing-sm));
+    right: 0;
+    background: rgba(15, 23, 42, 0.96);
+    color: #fff;
+    padding: var(--spacing-sm);
+    border-radius: 14px;
+    box-shadow: 0 24px 48px rgba(15, 23, 42, 0.25);
+    min-width: 220px;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    z-index: 20;
+}
+
+.diagram-meta-popover.is-open {
+    display: flex;
+}
+
+.diagram-meta-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.diagram-meta-section-title {
+    font-size: var(--font-size-xxs);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.72;
+}
+
+.diagram-meta-options {
+    display: flex;
+    gap: var(--spacing-xs);
+    flex-wrap: wrap;
+}
+
+.diagram-meta-option {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: 10px;
+    background: rgba(59, 130, 246, 0.15);
+    border: 1px solid transparent;
+    color: #e0f2fe;
+    font-size: var(--font-size-xs);
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.diagram-meta-option:hover {
+    background: rgba(59, 130, 246, 0.25);
+    border-color: rgba(191, 219, 254, 0.4);
+    transform: translateY(-1px);
+}
+
+.diagram-meta-option.is-active {
+    background: rgba(59, 130, 246, 0.4);
+    border-color: rgba(191, 219, 254, 0.6);
+    color: #fff;
+}
+
+.diagram-header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
 .diagram-title {
     font-weight: 600;
     font-size: var(--font-size-lg);
     color: var(--text-color);
+    letter-spacing: -0.01em;
 }
 
 .diagram-description {
@@ -1653,23 +1266,61 @@ plantuml-viewer-diagram {
     color: rgba(45, 55, 72, 0.8);
 }
 
-.diagram-preview {
-    min-height: 180px;
-    background: white;
-    border: 1px dashed rgba(49, 130, 206, 0.3);
-    border-radius: var(--border-radius);
+.diagram-content-container {
+    position: relative;
+    border-radius: calc(var(--border-radius-lg, 18px) - 6px);
+    background: #fff;
+    overflow: hidden;
+    padding-bottom: 28px;
+}
+
+.diagram-preview,
+.diagram-code-editor {
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 16px;
+    padding: var(--spacing-lg);
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--spacing-lg);
+    transition: opacity 0.25s ease;
+}
+
+.diagram-preview {
     overflow: hidden;
+}
+
+.diagram-preview.is-hidden,
+.diagram-code-editor.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+.diagram-image-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+    transform-origin: center;
+    width: 100%;
+    height: 100%;
 }
 
 .diagram-preview img {
     max-width: 100%;
+    max-height: 100%;
     height: auto;
-    border-radius: calc(var(--border-radius) / 1.5);
-    box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08);
+    border-radius: calc(var(--border-radius) - 6px);
+    box-shadow: 0 18px 36px rgba(15, 23, 42, 0.16);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.diagram-preview img:hover {
+    transform: scale(1.02);
 }
 
 .diagram-placeholder {
@@ -1678,32 +1329,258 @@ plantuml-viewer-diagram {
     text-align: center;
 }
 
-.diagram-source {
-    background: rgba(255, 255, 255, 0.6);
-    border: 1px solid rgba(49, 130, 206, 0.1);
-    border-radius: var(--border-radius);
+.diagram-code-editor {
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: stretch;
+}
+
+.diagram-code-block,
+.diagram-code-editor .code-block {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.diagram-code-editor .code-editor-container {
+    flex: 1;
+}
+
+.diagram-overlay-controls,
+.diagram-overlay-copies {
+    position: absolute;
+    display: flex;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xxs);
+    border-radius: calc(var(--border-radius));
+    pointer-events: auto;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+    opacity: 0.06;
+    transform: translateY(4px);
+}
+
+.diagram-overlay-controls {
+    right: var(--spacing-md);
+    bottom: calc(var(--spacing-md) - 8px);
+}
+
+.diagram-overlay-copies {
+    left: var(--spacing-md);
+    bottom: calc(var(--spacing-md) - 8px);
+}
+
+.diagram-overlay-controls:hover,
+.diagram-overlay-copies:hover {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.diagram-control-btn,
+.diagram-copy-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: rgba(15, 23, 42, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    color: rgba(255, 255, 255, 0.88);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xxs);
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+    font-size: var(--font-size-sm);
+}
+
+.diagram-overlay-controls:hover .diagram-control-btn,
+.diagram-overlay-copies:hover .diagram-copy-btn {
+    background: rgba(15, 23, 42, 0.78);
+    border-color: rgba(255, 255, 255, 0.28);
+}
+
+.diagram-control-btn:hover,
+.diagram-copy-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.28);
+}
+
+.diagram-edit-btn {
+    color: #fff;
+}
+
+.diagram-edit-btn:hover {
+    background: rgba(59, 130, 246, 0.28);
+}
+
+.diagram-resize-handle {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 6px;
+    cursor: ns-resize;
+    background: linear-gradient(180deg, rgba(148, 163, 184, 0.25) 0%, rgba(148, 163, 184, 0.35) 100%);
+}
+
+.diagram-resize-handle i {
+    display: none;
+}
+
+.diagram-loading {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: var(--spacing-sm);
+    color: rgba(59, 130, 246, 0.85);
+    font-size: var(--font-size-sm);
+}
+
+.diagram-preview.has-diagram-links svg .diagram-link-target {
+    cursor: pointer;
+    transition: filter 0.18s ease, opacity 0.18s ease;
+    filter: drop-shadow(0 0 3px rgba(59, 130, 246, 0.3));
+}
+
+.diagram-preview.has-diagram-links svg .diagram-link-target:hover,
+.diagram-preview.has-diagram-links svg .diagram-link-target:focus {
+    filter: drop-shadow(0 0 6px rgba(59, 130, 246, 0.55));
+}
+
+.diagram-link-selected {
+    filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.75));
+}
+
+.diagram-link-editor {
+    position: absolute;
+    min-width: 260px;
+    max-width: 320px;
+    background: rgba(15, 23, 42, 0.94);
+    color: #fff;
+    border-radius: 14px;
     padding: var(--spacing-md);
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.4);
     display: flex;
     flex-direction: column;
     gap: var(--spacing-sm);
+    z-index: 30;
+    pointer-events: auto;
 }
 
-.diagram-source-label {
-    font-size: var(--font-size-xs);
+.diagram-link-editor__title {
+    font-size: 0.875rem;
     font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    color: rgba(45, 55, 72, 0.6);
+    letter-spacing: 0.03em;
 }
 
-.diagram-source pre {
-    margin: 0;
-    font-size: var(--font-size-xs);
-    background: #0f172a;
+.diagram-link-editor__label {
+    font-size: 0.75rem;
+    opacity: 0.75;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.diagram-link-editor__input {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border-radius: 10px;
+    border: 1px solid rgba(148, 163, 184, 0.35);
+    background: rgba(30, 41, 59, 0.7);
     color: #e2e8f0;
-    padding: var(--spacing-md);
-    border-radius: var(--border-radius);
-    overflow-x: auto;
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.diagram-link-editor__input:focus {
+    border-color: rgba(99, 102, 241, 0.75);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.35);
+}
+
+.diagram-link-editor__extras {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: 0.8125rem;
+    color: rgba(226, 232, 240, 0.9);
+}
+
+.diagram-link-editor__checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    cursor: pointer;
+}
+
+.diagram-link-editor__actions {
+    display: flex;
+    gap: var(--spacing-xs);
+    justify-content: flex-end;
+}
+
+.diagram-link-editor__btn {
+    padding: 0.45rem 0.9rem;
+    border-radius: 10px;
+    border: none;
+    background: rgba(51, 65, 85, 0.75);
+    color: #e2e8f0;
+    font-size: 0.8125rem;
+    cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.diagram-link-editor__btn.primary {
+    background: rgba(59, 130, 246, 0.85);
+    color: #fff;
+}
+
+.diagram-link-editor__btn.danger {
+    background: rgba(239, 68, 68, 0.75);
+}
+
+.diagram-link-editor__btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 20px rgba(15, 23, 42, 0.25);
+}
+
+.diagram-link-context-menu {
+    position: absolute;
+    min-width: 190px;
+    padding: var(--spacing-sm);
+    border-radius: 12px;
+    background: rgba(15, 23, 42, 0.96);
+    box-shadow: 0 18px 36px rgba(15, 23, 42, 0.4);
+    display: none;
+    z-index: 35;
+}
+
+.diagram-link-context-menu.is-visible {
+    display: block;
+}
+
+.diagram-link-context-menu__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+}
+
+.diagram-link-context-menu__item {
+    width: 100%;
+    padding: 0.45rem 0.75rem;
+    border: none;
+    border-radius: 10px;
+    background: rgba(59, 130, 246, 0.15);
+    color: #e0f2fe;
+    font-size: 0.85rem;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.diagram-link-context-menu__item:hover {
+    background: rgba(59, 130, 246, 0.25);
+    transform: translateX(2px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.25);
 }
 
 /* ==========================================================================
@@ -1711,104 +1588,9 @@ plantuml-viewer-diagram {
    ========================================================================== */
 
 .plantuml-block {
-    margin: var(--spacing-lg) 0;
-    padding: var(--spacing-lg);
+    background: var(--page-background, var(--bg-color, #ffffff));
     border-radius: var(--border-radius);
-    border: 1px solid rgba(72, 61, 139, 0.2);
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(129, 140, 248, 0.08));
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-md);
-}
-
-.plantuml-header {
-    display: flex;
-    flex-direction: column;
-    gap: var(--spacing-xs);
-}
-
-.plantuml-title {
-    font-weight: 600;
-    font-size: var(--font-size-lg);
-    color: var(--text-color);
-}
-
-.plantuml-meta {
-    font-size: var(--font-size-xs);
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: rgba(79, 70, 229, 0.85);
-}
-
-.plantuml-description {
-    font-size: var(--font-size-sm);
-    color: rgba(45, 55, 72, 0.8);
-}
-
-.plantuml-preview {
-    min-height: 180px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px dashed rgba(129, 140, 248, 0.5);
-    border-radius: var(--border-radius);
-    background: rgba(255, 255, 255, 0.8);
-    padding: var(--spacing-lg);
-}
-
-.plantuml-preview img {
-    max-width: 100%;
-    height: auto;
-    box-shadow: 0 10px 24px rgba(79, 70, 229, 0.15);
-    border-radius: calc(var(--border-radius) / 1.5);
-}
-
-.plantuml-placeholder {
-    font-size: var(--font-size-sm);
-    color: rgba(79, 70, 229, 0.75);
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--spacing-sm);
-    padding: var(--spacing-lg);
-}
-
-.plantuml-spinner {
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    from {
-        transform: rotate(0deg);
-    }
-
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-.plantuml-spinner circle {
-    stroke-dasharray: 90, 150;
-    stroke-dashoffset: 0;
-    animation: dash 1.5s ease-in-out infinite;
-}
-
-@keyframes dash {
-    0% {
-        stroke-dasharray: 1, 150;
-        stroke-dashoffset: 0;
-    }
-
-    50% {
-        stroke-dasharray: 90, 150;
-        stroke-dashoffset: -35;
-    }
-
-    100% {
-        stroke-dasharray: 90, 150;
-        stroke-dashoffset: -124;
-    }
+    border: 1px solid rgba(226, 232, 240, 0.9);
 }
 
 .plantuml-source {
@@ -1837,6 +1619,208 @@ plantuml-viewer-diagram {
     padding: var(--spacing-md);
     border-radius: var(--border-radius);
     overflow-x: auto;
+}
+
+/* ==========================================================================
+   Стили для блока шагов (StepsBlock)
+   ========================================================================== */
+
+.steps-block {
+    background: linear-gradient(135deg, rgba(49, 130, 206, 0.12) 0%, rgba(56, 161, 169, 0.08) 100%);
+    border: 1px solid rgba(49, 130, 206, 0.18);
+    border-radius: calc(var(--border-radius) + 2px);
+    padding: var(--spacing-lg);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 18px 32px rgba(15, 23, 42, 0.08);
+}
+
+.steps-block::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0) 45%, rgba(15, 23, 42, 0.03) 100%);
+    pointer-events: none;
+}
+
+.steps-title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-md);
+    letter-spacing: 0.02em;
+    position: relative;
+    z-index: 1;
+}
+
+.steps-empty {
+    font-style: italic;
+    color: rgba(45, 55, 72, 0.7);
+    padding: var(--spacing-sm) 0;
+    position: relative;
+    z-index: 1;
+}
+
+.steps-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+    position: relative;
+    z-index: 1;
+}
+
+.step-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(226, 232, 240, 0.7);
+    border-radius: calc(var(--border-radius) + 2px);
+    box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
+    position: relative;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.step-item::before {
+    content: '';
+    position: absolute;
+    left: 23px;
+    top: calc(-1 * var(--spacing-md));
+    width: 2px;
+    height: calc(100% + var(--spacing-md) * 2);
+    background: linear-gradient(180deg, rgba(49, 130, 206, 0.2) 0%, rgba(49, 130, 206, 0) 100%);
+    z-index: 0;
+}
+
+.step-item:first-child::before {
+    top: 28px;
+    height: calc(100% + var(--spacing-md));
+}
+
+.step-item:last-child::before {
+    height: 28px;
+}
+
+.step-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.12);
+    border-color: rgba(59, 130, 246, 0.35);
+}
+
+.step-number {
+    position: relative;
+    z-index: 1;
+    flex-shrink: 0;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.95) 0%, rgba(49, 130, 206, 0.95) 70%);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1rem;
+    box-shadow: 0 10px 20px rgba(49, 130, 206, 0.32);
+    border: 2px solid rgba(255, 255, 255, 0.7);
+}
+
+.step-content {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--spacing-xs) / 2);
+    color: var(--text-color);
+    position: relative;
+    z-index: 1;
+}
+
+.step-title {
+    font-size: var(--font-size-md);
+    font-weight: 600;
+    letter-spacing: 0.01em;
+    color: rgba(15, 23, 42, 0.94);
+}
+
+.step-status {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--spacing-xs) / 2);
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: rgba(49, 130, 206, 0.12);
+    color: var(--accent-color);
+}
+
+.step-status::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.step-item[data-status="done"] .step-number {
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.95) 0%, rgba(56, 161, 105, 0.95) 70%);
+    box-shadow: 0 10px 20px rgba(56, 161, 105, 0.25);
+}
+
+.step-item[data-status="active"] .step-number {
+    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.95) 0%, rgba(237, 137, 54, 0.95) 70%);
+    box-shadow: 0 10px 20px rgba(237, 137, 54, 0.28);
+}
+
+.step-item[data-status="done"] .step-status {
+    background: rgba(56, 161, 105, 0.15);
+    color: var(--success-color);
+}
+
+.step-item[data-status="active"] .step-status {
+    background: rgba(237, 137, 54, 0.15);
+    color: var(--warning-color);
+}
+
+.step-description {
+    font-size: var(--font-size-sm);
+    color: rgba(71, 85, 105, 0.9);
+    line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+    .steps-block {
+        padding: var(--spacing-md);
+    }
+
+    .step-item {
+        flex-direction: column;
+        align-items: flex-start;
+        padding-left: calc(var(--spacing-md) + 8px);
+    }
+
+    .step-item::before {
+        left: 18px;
+        top: calc(-1 * var(--spacing-sm));
+        height: calc(100% + var(--spacing-sm) * 2);
+    }
+
+    .step-item:first-child::before {
+        top: 26px;
+    }
+
+    .step-number {
+        width: 38px;
+        height: 38px;
+        font-size: 0.9rem;
+        margin-bottom: var(--spacing-sm);
+    }
 }
 
 /* ==========================================================================
@@ -2106,32 +2090,47 @@ plantuml-viewer-diagram {
 }
 
 .btn {
-    padding: var(--spacing-sm) var(--spacing-md);
-    border: none;
-    border-radius: var(--border-radius);
+    padding: calc(var(--spacing-sm) + 2px) calc(var(--spacing-md) + 4px);
+    border: 1px solid transparent;
+    border-radius: calc(var(--border-radius) - 2px);
     font-size: var(--font-size-md);
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
-    transition: var(--transition);
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
     font-family: var(--font-family);
+    letter-spacing: 0.01em;
+}
+
+.btn:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.25);
 }
 
 .btn-primary {
-    background-color: var(--accent-color);
-    color: white;
+    background-color: var(--primary-color);
+    color: #ffffff;
+    border-color: rgba(26, 54, 93, 0.9);
+    box-shadow: 0 6px 18px rgba(26, 54, 93, 0.18);
 }
 
 .btn-primary:hover {
-    background-color: #2563eb;
+    background-color: #15325b;
+    border-color: #15325b;
+    box-shadow: 0 8px 22px rgba(21, 50, 91, 0.24);
 }
 
 .btn-secondary {
-    background-color: var(--light-color);
-    color: var(--text-color);
+    background-color: #f1f5f9;
+    color: var(--primary-color);
+    border-color: rgba(148, 163, 184, 0.6);
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08);
 }
 
 .btn-secondary:hover {
     background-color: #e2e8f0;
+    border-color: rgba(100, 116, 139, 0.6);
+    color: #1f2937;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
 }
 
 /* ==========================================================================
@@ -2258,4 +2257,72 @@ plantuml-viewer-diagram {
     margin-top: var(--spacing-lg);
     padding-top: var(--spacing-lg);
     border-top: 1px solid var(--border-color);
+}
+
+.diagram-fullscreen-placeholder {
+    color: #e2e8f0;
+    font-size: var(--font-size-lg);
+    letter-spacing: 0.02em;
+    padding: var(--spacing-lg) var(--spacing-xl);
+    text-align: center;
+}
+
+.diagram-modal-open {
+    overflow: hidden;
+}
+
+.diagram-fullscreen-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.92);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl);
+    z-index: 2147483647;
+}
+
+.diagram-fullscreen-content {
+    position: relative;
+    max-width: 95vw;
+    max-height: 95vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.diagram-fullscreen-image {
+    max-width: 100%;
+    max-height: calc(95vh - 48px);
+    object-fit: contain;
+    border-radius: var(--border-radius);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+}
+
+.diagram-fullscreen-svg {
+    max-width: 100%;
+    max-height: calc(95vh - 48px);
+}
+
+.diagram-fullscreen-close {
+    position: absolute;
+    top: -48px;
+    right: 0;
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgba(226, 232, 240, 0.4);
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.6);
+    color: #e2e8f0;
+    font-size: 1.4rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.diagram-fullscreen-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: rotate(90deg);
 }
